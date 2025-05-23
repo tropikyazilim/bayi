@@ -63,9 +63,9 @@ export default function MusteriListesi() {
   return (
     <div className="h-full w-full">
       <div className="h-full w-full p-1">        <div className="bg-white p-4 rounded-lg shadow-md grid grid-cols-1 shadow-slate-300">
-          <div className="p-4 border-b">
+          <div className="py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">Müşteri Listesi</h1>
+              <h1 className="text-2xl font-bold text-white">Müşteri Listesi</h1>
               </div>          </div>          <div className="flex-1 min-h-0">
               <div className="h-full overflow-auto">
                 <MusteriDataTable columns={mustericolums} data={Array.isArray(musteriData) ? musteriData : musteriData ? [musteriData] : []} />

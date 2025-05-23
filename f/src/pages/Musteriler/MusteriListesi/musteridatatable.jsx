@@ -61,13 +61,12 @@ export default function MusteriDataTable({ columns, data }) {
       {/* Tablo ve Scroll Container - Tek bir scroll container */}
       <div className="rounded-md border overflow-x-auto" style={{ minWidth: "100%" }}>
         <div style={{ minWidth: "1200px" }}>
-          <Table style={{ tableLayout: "fixed", width: "100%" }}>
-            <TableHeader>
+          <Table style={{ tableLayout: "fixed", width: "100%" }}>            <TableHeader className="bg-cyan-700">
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
+                <TableRow key={headerGroup.id} className="hover:bg-cyan-700">
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id}>
+                      <TableHead key={header.id} className="text-white">
                         {header.isPlaceholder
                           ? null
                           : flexRender(

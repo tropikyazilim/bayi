@@ -1006,11 +1006,25 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
             />
 
             <div className="flex items-end gap-4">
-              {" "}
-              <Button
+              {" "}              <Button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-400 text-white h-8 text-sm px-3 py-0 pl-4 pr-4 font-medium active:bg-blue-300 transition-colors"
+                className="bg-blue-500 hover:bg-blue-400 text-white h-8 text-sm px-3 py-0 pl-2 pr-6 font-medium active:bg-blue-300 transition-colors flex items-center"
               >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mr-1"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <path d="m21 21-4.3-4.3"></path>
+                </svg>
                 ARA
               </Button>
               <Button

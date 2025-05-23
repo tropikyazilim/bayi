@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import PaketListesiDataTable from "./paketlistesidatatable";
+import { PaketListesiDataTable } from "./paketlistesidatatable";
 import { paketlistesicolumns } from "./paketlistesicolumns";
 import axios from "axios";
 import { toast } from "sonner";
@@ -16,9 +16,7 @@ export default function PaketListesi() {
     queryKey: ["paketler"],
     queryFn: async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3002/api/paketler"
-        );
+        const response = await axios.get("http://localhost:3002/api/paketler");
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);
@@ -62,15 +60,20 @@ export default function PaketListesi() {
 
   return (
     <div className="h-full w-full">
-      <div className="h-full w-full p-1">        <div className="bg-white p-4 rounded-lg shadow-md grid grid-cols-1 shadow-slate-300">
-          <div className="p-4 border-b">
+      <div className="h-full w-full p-1">
+        {" "}
+        <div className="bg-white p-4 rounded-lg shadow-md grid grid-cols-1 shadow-slate-300">
+          <div className="py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold">Paket Listesi</h1>
-              
-            </div>          </div>
+              <h1 className="text-2xl font-bold text-white">Paket Listesi</h1>
+            </div>{" "}
+          </div>
           <div className="flex-1 min-h-0">
             <div className="h-full overflow-auto">
-              <PaketListesiDataTable columns={paketlistesicolumns} data={paketData || []} />
+              <PaketListesiDataTable
+                columns={paketlistesicolumns}
+                data={paketData || []}
+              />
             </div>
           </div>
         </div>

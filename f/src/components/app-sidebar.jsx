@@ -141,11 +141,11 @@ export function AppSidebar({ onSignOut, ...props }) {
         url: "#",
         items: [
           {
-            title: "İstek Ekle",
+            title: "Demo Ekle",
             url: "demoekle",
           },
           {
-            title: "İstek Listesi",
+            title: "Demo Listesi",
             url: "demolistesi",
           },
         ],

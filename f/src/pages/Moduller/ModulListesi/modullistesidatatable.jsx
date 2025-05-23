@@ -144,15 +144,14 @@ export default function ModulListesiDataTable({ columns, data }) {
         />
       </div>
 
-      {/* Tablo ve Scroll Container - Tek bir scroll container */}
-      <div className="rounded-md border overflow-x-auto" style={{ minWidth: "100%" }}>
+      {/* Tablo ve Scroll Container - Tek bir scroll container */}      <div className="rounded-md border overflow-x-auto" style={{ minWidth: "100%" }}>
         <div style={{ minWidth: "1200px" }}>
           <Table style={{ tableLayout: "fixed", width: "100%" }}>
-            <TableHeader className="bg-[#F2C078] text-white">
+            <TableHeader className="bg-cyan-700">
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
+                <TableRow key={headerGroup.id} className="hover:bg-cyan-700">
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="text-white">
                       {header.isPlaceholder
                         ? null
                         : flexRender(

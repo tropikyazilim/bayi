@@ -486,14 +486,12 @@ export default function LisansEkle() {
             )}
 
             {/* Lisans Bilgileri Başlık */}
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-3 bg-green-100 rounded-lg px-4 md:px-6 py-3 mb-4 border-b border-gray-200 shadow-sm min-h-0 w-full">
-              <span className="text-lg md:text-xl font-bold text-slate-700 ">
+            <div className="py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
+              <span className="text-2xl font-bold text-white ">
                 LİSANS BİLGİLERİ
               </span>
-              <span className="hidden md:inline h-8 w-0.5 bg-gray-500 mx-4 rounded-full" />
-              <span className="text-slate-700 text-sm md:text-base font-medium mt-1 md:mt-0">
-                Lisans oluşturmak için gerekli bilgileri giriniz.
-              </span>
+              
+              
             </div>
 
             {/* Lisans Bilgileri Form Alanları */}
@@ -883,9 +881,9 @@ export default function LisansEkle() {
             </div>
 
             {/* Modüller Başlık */}
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-3 bg-blue-400 rounded-lg px-4 md:px-6 py-3 mt-6 mb-4 border-b border-gray-200 shadow-sm min-h-0 w-full">
-              <span className="text-lg md:text-xl font-bold text-white drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]">
-                MODÜLLER
+            <div className="py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
+              <span className="text-2xl font-bold text-white ">
+                Modüller
               </span>
               <span className="hidden md:inline h-8 w-0.5 bg-gray-500 mx-4 rounded-full" />
               <span className="text-white text-sm md:text-base font-medium mt-1 md:mt-0">
