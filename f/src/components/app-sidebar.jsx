@@ -317,7 +317,7 @@ export function AppSidebar({ onSignOut, ...props }) {
                                     to={subItem.url}
                                     className={
                                       activeItem === subItem.title
-                                        ? "bg-indigo-100  font-medium rounded-md px-3 py-2 flex items-center border-l-4 border-indigo-500" // 
+                                        ? "bg-cyan-100  font-medium rounded-md px-3 py-2 flex items-center border-l-4 border-cyan-500" // 
                                         : " text-sidebar-foreground px-3 py-2 rounded-md transition-colors duration-75"
                                     }
                                     onClick={() => handleItemClick(subItem.title)}

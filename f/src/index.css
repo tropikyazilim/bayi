@@ -71,7 +71,7 @@
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
 --sidebar: rgb(255, 255, 255);              /* Düz beyaz */
---sidebar-foreground: rgb(51, 65, 85);         /* Katı siyah yazı */
+--sidebar-foreground: rgb(29, 36, 46);         /* Katı siyah yazı */
 --sidebar-primary: rgb(14, 116, 144);          /* Kırmızı blok */
 --sidebar-primary-foreground: rgb(255, 255, 255); 
 --sidebar-accent: rgb(14, 116, 144);          /* Siyah köşe çizgileri */

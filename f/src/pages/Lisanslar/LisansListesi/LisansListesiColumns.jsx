@@ -118,7 +118,7 @@ export const columns = [  {
         <ArrowUpDown className="ml-1 h-3 w-3" />
       </div>
     ),
-    size: 110,
+    
     enableResizing: true,
     size: 110,
     minSize: 110,

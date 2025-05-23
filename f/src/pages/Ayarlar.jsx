@@ -60,26 +60,32 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function Ayarlar() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
-  const queryClient = useQueryClient();
-
-  const formSchema = z.object({
+  const queryClient = useQueryClient();  const formSchema = z.object({
     modul_kodu: z.string().min(1, "Modül kodu gerekli"),
-    // Add other fields for both tabs here
-    // current_password: z.string().optional(),
-    // new_password: z.string().optional(),
+    kullanici_sayisi: z.string().min(1, "Kullanıcı sayısı gerekli"),
+    is_demo_ayar: z.enum(["E", "H"]).default("H"),
   });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       modul_kodu: "",
-      // current_password: "",
-      // new_password: "",
+      kullanici_sayisi: "",
+      is_demo_ayar: "H",
     },
-  });  const updateParametersMutation = useMutation({
+  });    const updateParametersMutation = useMutation({
     mutationFn: (parameterData) => {
       console.log("Mutation çağrıldı, gönderilen veri:", parameterData);
-      return axios.put("http://localhost:3002/api/ayarlar", parameterData);
+      
+      // Content-Type header'ı ekleyerek ve stringification yaparak gönderelim
+      const dataJson = JSON.stringify(parameterData);
+      console.log("Stringified data:", dataJson);
+      
+      return axios.put("http://localhost:3002/api/ayarlar", dataJson, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
     },
     onSuccess: (response) => {
       console.log("Başarılı yanıt:", response.data);
@@ -124,7 +130,9 @@ export default function Ayarlar() {
       });
       setSuccess(false);
     },
-  });  function onSubmit(values) {
+  });  
+  
+  function onSubmit(values) {
     console.log("Form Verileri:", values);
     console.log("Form hataları:", form.formState.errors);
 
@@ -132,6 +140,11 @@ export default function Ayarlar() {
     // Bu yöntem, sekme değişikliklerinden etkilenmeden, güvenilir şekilde form değerlerini toplar
     const allFormValues = form.getValues();
     console.log("Tüm form değerleri:", allFormValues);
+    
+    // Doğrudan values nesnesini kullan - bu şekilde zod doğrulaması yapılmış değerleri alırız
+    // Bu, beklenmeyen veri tiplerini önler
+    const validatedValues = values;
+    console.log("Doğrulanmış form değerleri:", validatedValues);
 
     const parametreValues = [];
     
@@ -141,8 +154,7 @@ export default function Ayarlar() {
       "kullanici_sayisi": "2",
       "is_demo_ayar": "3"
     };
-    
-    // Form değerlerinden parametre değerlerini oluştur
+      // Form değerlerinden parametre değerlerini oluştur
     Object.keys(fieldMappings).forEach((fieldName) => {
       if (allFormValues[fieldName] !== undefined) {
         const parametreId = fieldMappings[fieldName];
@@ -160,8 +172,15 @@ export default function Ayarlar() {
           console.log("Switch değeri normalize edildi:", degerValue);
         }
         
+      // Kullanıcı sayısını kontrol et - sayı da olabilir string de
+        if (fieldName === "kullanici_sayisi") {
+          // Sayısal değeri string olarak gönder - JSON için güvenli format
+          degerValue = String(degerValue);
+        }        // JSONB tipine uygun olarak değer hazırla
+        // Değeri direk olarak gönder, backend tarafında JSON işlemi yapılacak
+        // parametreId de string olmalı
         parametreValues.push({
-          parametreid: parametreId,
+          parametreid: String(parametreId),
           deger: degerValue,
         });
       }

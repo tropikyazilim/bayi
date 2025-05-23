@@ -21,7 +21,6 @@ import PaketDuzenle from "./pages/Paketler/PaketDuzenle";
 import LisansEkle from "./pages/Lisanslar/LisansEkle/LisansEkle";
 import LisansListesi from "./pages/Lisanslar/LisansListesi/LisansListesi";
 import LisansDuzenle from "./pages/Lisanslar/LisansDuzenle";
-import { Toaster } from "sonner";
 import DemoEkle from "./pages/Demolar/DemoEkle/DemoEkle";
 import DemoListesi from "./pages/Demolar/DemoListesi/DemoListesi";
 import DemoDuzenle from "./pages/Demolar/DemoDuzenle";
@@ -64,11 +63,9 @@ const router = createBrowserRouter([
 ]);
 
 const queryClient = new QueryClient();
-function App() {
-  return (
+function App() {  return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
-      <Toaster position="top-right" richColors closeButton />
     </QueryClientProvider>
   );
 }

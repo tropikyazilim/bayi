@@ -548,9 +548,9 @@ const form = useForm({
               )}
 
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                <h1 className="text-2xl font-bold text-white py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
                   Demo Talebi
-                </h2>
+                </h1>
                 <div className="h-0.5 bg-gray-200 w-full"></div>
               </div>
 

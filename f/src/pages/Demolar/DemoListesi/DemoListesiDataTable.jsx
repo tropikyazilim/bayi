@@ -2,6 +2,9 @@
 import axios from "axios";
 import * as React from "react";
 import { useState, useEffect } from "react";
+import {  useMutation} from "@tanstack/react-query";
+import { ChevronDown } from "lucide-react"; // Dropdown menü ok simgesi için
+import { DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner"; // Toast bildirimleri için
 import {
   Dialog,
@@ -11,6 +14,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   flexRender,
   getCoreRowModel,
@@ -83,7 +100,7 @@ export function StatusCell({ row, value, table }) {
   const statusStyle = durumStyles[durum] || durumStyles.default;
   return (
     <div className="px-0 py-0.5 relative w-full h-full">
-      <select 
+      <select
         className={`w-full text-center px-3 py-1.5 appearance-none ${statusStyle} ${
           isUpdating ? "opacity-50" : ""
         }`}
@@ -97,7 +114,7 @@ export function StatusCell({ row, value, table }) {
           </option>
         ))}
       </select>
-      
+
       {isUpdating && (
         <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-30">
           <div className="h-3 w-3 animate-spin rounded-full border-2 border-b-transparent border-t-current"></div>
@@ -107,7 +124,7 @@ export function StatusCell({ row, value, table }) {
   );
 }
 
-export default function DemoListesiDataTable({ columns, data, refetch }) {
+export default function DemoListesiDataTable({ columns, data, refetch, degerler   }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [error, setError] = useState(null);
@@ -117,7 +134,29 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
   // Store pagination information in state instead of refs
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [isManualPageChange, setIsManualPageChange] = useState(false);
+  const [success, setSuccess] = useState(false);
+  // Son güncelleme zamanını tutmak için state
+  const [lastUpdateTime, setLastUpdateTime] = useState(null);
 
+  // Parametreleri getirmek için useQuery kullanımı
+  const {
+    data: parametersData,
+    isLoading,
+    error: queryError
+  } = useQuery({
+    queryKey: ["parametreler"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("http://localhost:3002/api/ayarlar");
+        return response.data || [];
+      } catch (error) {
+        console.error("API Hatası:", error);
+        throw error;
+      }
+    },
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
   // Add useEffect to log data when component mounts or data changes
   useEffect(() => {
     console.log("Demo Listesi Data:", data);
@@ -133,6 +172,124 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
   const [columnSizing, setColumnSizing] = useState({});
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedDemoId, setSelectedDemoId] = useState(null);
+    // Tabloya kaydedilen tasarımı yükleyelim
+  useEffect(() => {
+    if (parametersData && parametersData.length > 0) {
+      // ID'si 4 olan parametreyi bul
+      const tasarimParametre = parametersData.find(param => param.parametreid === 4);
+      
+      if (tasarimParametre && tasarimParametre.deger) {
+        try {
+          // Eğer deger string ise JSON olarak parse et
+          let tasarimVerisi;
+          if (typeof tasarimParametre.deger === 'string') {
+            tasarimVerisi = JSON.parse(tasarimParametre.deger);
+          } else {
+            // Zaten obje ise doğrudan kullan
+            tasarimVerisi = tasarimParametre.deger;
+          }
+          
+          console.log("Kayıtlı tablo tasarımı yükleniyor:", tasarimVerisi);
+          
+          // Sütun genişlikleri varsa uygula
+          if (tasarimVerisi.columnSizing) {
+            setColumnSizing(tasarimVerisi.columnSizing);
+            console.log("Sütun genişlikleri yüklendi:", tasarimVerisi.columnSizing);
+          }
+          
+          // Filtre ayarları varsa uygula
+          if (tasarimVerisi.columnFilters && tasarimVerisi.columnFilters.length > 0) {
+            setColumnFilters(tasarimVerisi.columnFilters);
+            console.log("Filtreler yüklendi:", tasarimVerisi.columnFilters);
+          }
+          
+          // Sıralama ayarları varsa uygula (table state üzerinden)
+          if (tasarimVerisi.sorting && tasarimVerisi.sorting.length > 0) {
+            // Bu işlem table oluşturulduktan sonra yapılmalı,
+            // bu yüzden sadece logu basıyoruz, table oluşunca uygulanacak
+            console.log("Sıralama bilgileri yüklendi:", tasarimVerisi.sorting);
+            // setSorting yapabiliriz ama bunun için table component'inde sorting state'i tanımlanmalı
+          }
+          
+          // Son güncelleme zamanını kaydet (varsa)
+          if (tasarimParametre.kayitzamani) {
+            setLastUpdateTime(tasarimParametre.kayitzamani);
+            console.log("Son güncelleme zamanı yüklendi:", tasarimParametre.kayitzamani);
+          }
+          
+        } catch (error) {
+          console.error("Tablo tasarımı yüklenirken hata:", error);
+        }
+      }
+    }
+  }, [parametersData]);
+
+
+//tasarımı kaydetmek için backende put isteği atılacak
+const updateParametersMutation = useMutation({
+    mutationFn: (parameterData) => {
+      console.log("Mutation çağrıldı, gönderilen veri:", parameterData);
+          // Artık parameterData zaten array olduğu için axios doğrudan dönüştürebilir
+      console.log("Gönderilecek veri:", parameterData);
+      
+      return axios.put("http://localhost:3002/api/ayarlar", parameterData, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+    },    onSuccess: (response) => {
+      console.log("Başarılı yanıt:", response.data);
+      setSuccess(true);
+      setError(null);
+
+      // Parametreler listesini güncelle
+      queryClient.invalidateQueries(["parametreler"]);
+      
+      // Son güncelleme zamanını ayarla (eğer yanıtta varsa)
+      if (response.data.updatedAyarlar && response.data.updatedAyarlar.length > 0) {
+        const updatedParam = response.data.updatedAyarlar.find(param => param.parametreid === 4);
+        if (updatedParam && updatedParam.kayitzamani) {
+          setLastUpdateTime(updatedParam.kayitzamani);
+        }
+      }
+
+      toast.success("Tüm değerler başarıyla güncellendi", {
+        description: "İşlem başarıyla tamamlandı",
+        style: {
+          backgroundColor: "#dcfce7",
+          border: "1px solid #86efac",
+          color: "#166534",
+        },
+      });
+    },
+    onError: (error) => {
+      console.error("Mutation hatası:", error);
+      console.error("Hata detayları:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      // Hata detaylarını göster
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          "Değerler güncellenirken bir hata oluştu";
+      
+      setError(errorMessage);
+      
+      toast.error("Hata", {
+        description: errorMessage,
+        style: {
+          backgroundColor: "#fee2e2",
+          border: "1px solid #fca5a5",
+          color: "#991b1b",
+        },
+      });
+      setSuccess(false);
+    },
+  });
+
 
   // Clean up the timeout when the component unmounts
   React.useEffect(() => {
@@ -157,7 +314,6 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
       setIsManualPageChange(false);
     }
   }, [data, currentPageIndex, isManualPageChange]);
-
   const handleDelete = async () => {
     try {
       console.log("Silinmeye çalışılan demo ID:", selectedDemoId);
@@ -187,8 +343,169 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
       setOpenDeleteDialog(false);
     }
   };
-  //tablo yapılandırması
+    function handleVarsayilanTasarim() {
+    // Varsayılan tasarımı backend'den çek
+    toast.info("Varsayılan tasarım yükleniyor...");
+    
+    axios
+      .get("http://localhost:3002/api/ayarlar/varsayilan/4")
+      .then((response) => {
+        console.log("Varsayılan tasarım yanıtı:", response.data);
+        let tasarimVerisi;
+        
+        // Yanıt formatına göre veriyi çıkar
+        if (response.data?.deger) {
+          // deger alanı varsa
+          const deger = response.data.deger;
+          tasarimVerisi = typeof deger === 'string' ? JSON.parse(deger) : deger;
+        } else {
+          // Direkt olarak yanıt objesi kullanılabilir
+          tasarimVerisi = response.data;
+        }
+          // Varsayılan tasarımı uygula
+        if (tasarimVerisi) {
+          console.log("Varsayılan tasarım uygulanıyor:", tasarimVerisi);
+          
+          // Sütun genişliklerini uygula
+          setColumnSizing(tasarimVerisi.columnSizing || {});
+          console.log("Sütun genişlikleri sıfırlandı:", tasarimVerisi.columnSizing || {});
+          
+          // Filtreleri uygula
+          setColumnFilters(tasarimVerisi.columnFilters || []);
+          console.log("Filtreler sıfırlandı:", tasarimVerisi.columnFilters || []);
+          
+          // Sıralamayı uygula
+          setSorting(tasarimVerisi.sorting || []);
+          console.log("Sıralama sıfırlandı:", tasarimVerisi.sorting || []);
+            // Sütun sıralamasını uygula
+          const defaultColumnOrder = tasarimVerisi.columnOrder || [];
+          setColumnOrder(defaultColumnOrder);
+          console.log("Sütun sıralaması sıfırlandı:", defaultColumnOrder);
+            // Sütun görünürlüğünü uygula
+          const defaultVisibility = tasarimVerisi.columnVisibility || {};
+          // React Table'da columnVisibility state olarak tanımlanmamış, 
+          // bu nedenle table state'ini doğrudan güncelliyoruz
+          if (table) {
+            table.setColumnVisibility(defaultVisibility);
+          }
+          console.log("Sütun görünürlüğü sıfırlandı:", defaultVisibility);
+          
+          // Son güncelleme zamanını kaydet
+          if (response.data.kayitzamani) {
+            setLastUpdateTime(response.data.kayitzamani);
+          }
+          
+          toast.success("Varsayılan tablo tasarımı yüklendi");
+        } else {
+          toast.info("Varsayılan tasarım bulunamadı");
+        }
+      })
+      .catch((error) => {
+        console.error("Varsayılan tasarım getirme hatası:", error);
+        toast.error("Varsayılan tasarım yüklenirken hata oluştu: " + 
+          (error.response?.data?.message || error.message));
+      });
+  }
 
+  // Yardımcı fonksiyon: Tarihi formatla
+  function formatDateTime(dateTimeString) {
+    if (!dateTimeString) return '';
+    
+    const date = new Date(dateTimeString);
+    
+    // Geçerli bir tarih mi kontrol et
+    if (isNaN(date.getTime())) return '';
+    
+    // Tarih ve saat formatla
+    return new Intl.DateTimeFormat('tr-TR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    }).format(date);
+  }
+
+  function handleTasarimiKaydet () {
+    // Tablo sütun genişlik bilgilerini al (birincil amaç)
+    const currentColumnSizing = table.getState().columnSizing;
+    
+    // Ekstra olarak diğer tablo ayarlarını da kaydedebiliriz
+    // Bu sayede kullanıcı tabloyu tam bıraktığı şekilde geri alabilir
+    const currentColumnVisibility = table.getState().columnVisibility || {};
+    const currentColumnFilters = table.getState().columnFilters || [];
+    const currentSorting = table.getState().sorting || [];
+    const currentColumnOrder = table.getAllLeafColumns().map(column => column.id);
+      // Kaydedilecek veri objesini oluştur (kayıt zamanı bilgisini eklemiyoruz)
+    const tasarimVerisi = {
+      columnSizing: currentColumnSizing, // Sütun genişlikleri
+      columnVisibility: currentColumnVisibility, // Hangi sütunların görünür olduğu
+      columnFilters: currentColumnFilters, // Filtreler
+      sorting: currentSorting, // Sıralama
+      columnOrder: currentColumnOrder // Sütun sıralaması
+    };
+    
+    console.log("Tablo tasarımı kaydediliyor:", tasarimVerisi);
+    
+    // Backend'in beklediği formata göre veriyi hazırla
+    // Backend 'parametreid' ve 'deger' alanları bekliyor (id ve value değil)
+    const parameterData = [{
+      parametreid: 4, // id yerine parametreid kullan
+      deger: tasarimVerisi // JSON.stringify yapmıyoruz, controller bunu zaten hallediyor
+    }];
+    
+    console.log("API'ye gönderilecek veri:", parameterData);
+      // Veriyi backend'e gönder
+    updateParametersMutation.mutate(parameterData);
+    
+    // Kullanıcıya bilgi ver
+    toast.info("Tablo tasarımı kaydediliyor...");
+    
+    // Eğer daha önce kaydedilmiş bir zaman bilgisi varsa göster
+    if (lastUpdateTime) {
+      toast.info(`Son kayıt: ${formatDateTime(lastUpdateTime)}`, {
+        duration: 3000,
+        style: {
+          backgroundColor: "#e0f2fe",
+          border: "1px solid #93c5fd",
+          color: "#1e40af",
+        },
+      });
+    }
+  };
+  //tablo yapılandırması
+  // Kaydedilmiş sıralama durumunu tablo oluşturulurken kullanmak için state'e alalım
+  const [sorting, setSorting] = useState([]);
+  
+  // Kaydedilmiş sıralama bilgilerini yükleme useEffect'i
+  useEffect(() => {
+    if (parametersData && parametersData.length > 0) {
+      const tasarimParametre = parametersData.find(param => param.parametreid === 4);
+      if (tasarimParametre && tasarimParametre.deger) {
+        try {
+          // Eğer deger string ise JSON olarak parse et
+          let tasarimVerisi;
+          if (typeof tasarimParametre.deger === 'string') {
+            tasarimVerisi = JSON.parse(tasarimParametre.deger);
+          } else {
+            tasarimVerisi = tasarimParametre.deger;
+          }
+          
+          // Sıralama varsa uygula
+          if (tasarimVerisi.sorting && tasarimVerisi.sorting.length > 0) {
+            console.log("Sıralama bilgileri uygulanıyor:", tasarimVerisi.sorting);
+            setSorting(tasarimVerisi.sorting);
+          }
+        } catch (error) {
+          console.error("Sıralama bilgileri yüklenirken hata:", error);
+        }
+      }
+    }
+  }, [parametersData]);
+  // Sütun sıralaması için state
+  const [columnOrder, setColumnOrder] = useState([]);
+  
   const table = useReactTable({
     data,
     columns,
@@ -197,18 +514,20 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
       columnFilters,
       columnSizing,
       columnResizeMode,
+      sorting, // Kaydedilmiş sıralama bilgilerini kullan
+      columnOrder, // Kaydedilmiş sütun sıralamasını kullan
       pagination: {
         pageIndex: currentPageIndex,
         pageSize: 10,
       },
     },
     enableSorting: true,
-    enableMultiSort: true,
-    enableColumnFilters: true,
-    onColumnFiltersChange: setColumnFilters,
-    enableColumnResizing: true,
+    enableMultiSort: true,    enableColumnFilters: true,
+    onColumnFiltersChange: setColumnFilters,    enableColumnResizing: true,
     columnResizeMode,
     onColumnSizingChange: setColumnSizing,
+    onSortingChange: setSorting, // Sıralama durumu değiştiğinde bunu state'e kaydet
+    onColumnOrderChange: setColumnOrder, // Sütun sıralaması değiştiğinde bunu state'e kaydet
     getCoreRowModel: getCoreRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -273,8 +592,9 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
   return (
     //tüm alanlarda arama
     <div className="w-full">
-      <div className="flex items-center justify-between py-2 mb-2">        <div 
-        className="flex w-full justify-between gap-5">
+      <div className="flex items-center justify-between py-2 mb-2">
+        {" "}
+        <div className="flex w-full justify-between gap-5">
           {" "}
           <Input
             placeholder="Tüm alanlarda arama yapın..."
@@ -299,17 +619,75 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
               </svg>
             }
           />
-          <Button
-          className={"bg-emerald-500 hover:bg-emerald-600 active:bg-cyan-700 h-8 w-20 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200"}
-          onClick={() => refetch()}
-          >Yenile</Button>
+          <div>
+             <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Sütun Seçimi <ChevronDown />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                )
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">İşlemler</Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">                <DropdownMenuLabel>Tablo Ayarları</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                  onClick={handleTasarimiKaydet}
+                  >
+                    Tasarımı Kaydet
+                    <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                  onClick={handleVarsayilanTasarim}
+                  >
+                    Tasarımı Sıfırla
+                    <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+                  </DropdownMenuItem>
+                 
+                  <DropdownMenuSeparator />
+                  
+                </DropdownMenuGroup>
+               
+               
+                
+                
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button
+              className={
+                "bg-emerald-500 hover:bg-emerald-600 active:bg-cyan-700 h-8 w-20 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200"
+              }
+              onClick={() => refetch()}
+            >
+              Yenile
+            </Button>
+          </div>
         </div>
-        <div className="text-xs flex items-center">
-          {" "}
-          
-          
-        </div>
-      </div>      <div className="rounded-md border border-gray-300">
+        <div className="text-xs flex items-center"> </div>
+      </div>{" "}
+      <div className="rounded-md border border-gray-300">
         <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
           <DialogContent className="sm:max-w-md rounded-lg">
             <DialogHeader>
@@ -330,7 +708,8 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
               >
                 İptal
               </Button>
-              <Button                onClick={handleDelete}
+              <Button
+                onClick={handleDelete}
                 className="bg-[#5F99AE] hover:bg-[#4b7a8c] text-white font-medium rounded-lg transition-all duration-200 px-5 py-2.5 flex items-center "
               >
                 <svg
@@ -360,10 +739,9 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
                 Filtreleniyor...
               </p>
             </div>
-          </div>        ) : (          <Table
-            key={`table-${paginationKey}`}
-            className="w-full"
-          >
+          </div>
+        ) : (
+          <Table key={`table-${paginationKey}`} className="w-full">
             <TableHeader className="w-full">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
@@ -552,9 +930,11 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row, rowIndex) => (                  <TableRow
+                table.getRowModel().rows.map((row, rowIndex) => (
+                  <TableRow
                     key={row.id}
-                    data-state={row.getIsSelected() && "selected"}                    className={
+                    data-state={row.getIsSelected() && "selected"}
+                    className={
                       rowIndex % 2 === 0
                         ? "bg-white hover:bg-[#e1f0f5]"
                         : "bg-[#eaf5fa] hover:bg-[#d0e8f0]"
@@ -601,35 +981,8 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
                                   <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                 </svg>
                                 <span className="sr-only">Düzenle</span>
-                              </Button>{" "}                              <Button
-                                onClick={() => {
-                                  setSelectedDemoId(row.original.id);
-                                  setOpenDeleteDialog(true);
-                                  console.log(
-                                    "Silinmek üzere seçilen demo ID:",
-                                    row.original.id
-                                  );
-                                }}
-                                variant="outline"
-                                size="icon-sm"
-                                className="mx-auto border border-[#aad0de] text-[#5F99AE] hover:bg-[#eef6fa] hover:text-[#4b7a8c]"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                                  />
-                                </svg>
-                                <span className="sr-only">Sil</span>
-                              </Button>
+                              </Button>{" "}
+                             
                             </div>
                           </TableCell>
                         );
@@ -711,7 +1064,8 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
             </TableBody>
           </Table>
         )}
-      </div>{" "}      <div className="py-4 flex items-center justify-between gap-2 border-t border-gray-100 mt-2 pt-3">
+      </div>{" "}
+      <div className="py-4 flex items-center justify-between gap-2 border-t border-gray-100 mt-2 pt-3">
         <div className="text-sm text-[#5F99AE] font-medium flex items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -733,7 +1087,8 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
           Toplam {table.getFilteredRowModel().rows.length} kayıt
         </div>
         <div className="flex items-center gap-2">
-          {" "}          <Button
+          {" "}
+          <Button
             variant="outline"
             size="sm"
             onClick={() => {
@@ -765,11 +1120,13 @@ export default function DemoListesiDataTable({ columns, data, refetch }) {
               <path d="m15 18-6-6 6-6" />
             </svg>
             Önceki{" "}
-          </Button>{" "}          <div className="flex items-center gap-1 bg-[#eef6fa] px-4 py-1.5 rounded-md">
+          </Button>{" "}
+          <div className="flex items-center gap-1 bg-[#eef6fa] px-4 py-1.5 rounded-md">
             <span className="text-sm font-medium text-[#5F99AE]">
               Sayfa {currentPageIndex + 1} / {table.getPageCount()}
             </span>
-          </div>          <Button
+          </div>{" "}
+          <Button
             variant="outline"
             size="sm"
             onClick={() => {

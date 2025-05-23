@@ -494,394 +494,378 @@ export default function LisansEkle() {
               
             </div>
 
-            {/* Lisans Bilgileri Form Alanları */}
-            <div className="w-full flex flex-col md:flex-row flex-wrap gap-4 items-stretch md:items-end mt-1">
-              {/* Bayi */}
-              <div className="flex-1 min-w-[150px] max-w-full">
-                <FormField
-                  control={form.control}
-                  name="bayi_adi"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
-                        Bayi
-                      </FormLabel>
-                      <FormControl>
-                        <Popover
-                          open={openBayi}
-                          onOpenChange={(open) => {
-                            setOpenBayi(open);
-                            if (open) refetchBayiler();
-                          }}
+            {/* Lisans Bilgileri Form Alanları */}            <div className="w-full flex flex-col md:flex-row flex-wrap gap-4 items-stretch md:items-end my-4">
+              {/* Bayi */}              <FormField                control={form.control}
+                name="bayi_adi"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1 w-full sm:w-auto">
+                    <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
+                      Bayi
+                    </FormLabel>
+                    <FormControl>
+                      <Popover
+                        open={openBayi}
+                        onOpenChange={(open) => {
+                          setOpenBayi(open);
+                          if (open) refetchBayiler();
+                        }}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            size="default"
+                            aria-expanded={openBayi}
+                            className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 w-full justify-between min-h-0"
+                          >
+                            <span
+                              className={
+                                field.value ? "" : "font-normal text-gray-400"
+                              }
+                            >
+                              {field.value ? field.value : "Bayi Seçiniz..."}
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-full p-0 border border-gray-400 rounded shadow-sm"
+                          align="start"
+                          sideOffset={4}
                         >
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              size="default"
-                              aria-expanded={openBayi}
-                              className="w-full justify-between text-gray-700"
-                            >
-                              <span
-                                className={
-                                  field.value ? "" : "font-normal text-gray-400"
-                                }
-                              >
-                                {field.value ? field.value : "Bayi Seçiniz..."}
-                              </span>
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-full p-0 border border-gray-400 rounded shadow-sm"
-                            align="start"
-                            sideOffset={4}
+                          <Command>
+                            <CommandInput
+                              placeholder="Bayi ara..."
+                              className="h-8"
+                              value={bayiSearch}
+                              onValueChange={(value) => {
+                                setBayiSearch(value);
+                              }}
+                            />
+                            <CommandList className="max-h-[160px]">
+                              {isFetching ? (
+                                <div className="py-2 text-center text-sm">
+                                  Yükleniyor...
+                                </div>
+                              ) : filteredBayiler.length === 0 ? (
+                                <CommandEmpty>Bayi bulunamadı.</CommandEmpty>
+                              ) : (
+                                <CommandGroup>
+                                  {filteredBayiler.map((bayi) => (
+                                    <CommandItem
+                                      key={bayi.id}
+                                      value={bayi.id.toString()}
+                                      onSelect={() => {
+                                        setSelectedBayi(bayi);
+                                        field.onChange(bayi.unvan);
+                                        setOpenBayi(false);
+                                      }}
+                                      className="text-sm font-medium text-gray-800"
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          filteredBayiler.find((framework) => framework.unvan === field.value)?.unvan === bayi.unvan
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {bayi.unvan}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              )}
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              
+              {/* Müşteri Adı */}              <FormField
+                control={form.control}
+                name="musteri_adi"
+                render={({ field }) => (                  <FormItem className="flex flex-col gap-1 w-full sm:w-auto">
+                    <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
+                      Müşteri Adı
+                    </FormLabel>
+                    <FormControl>
+                      <Popover
+                        open={openMusteri}
+                        onOpenChange={(open) => {
+                          setOpenMusteri(open);
+                          if (open) refetchMusteri();
+                        }}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            size="default"
+                            aria-expanded={openMusteri}
+                            className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 w-full justify-between min-h-0"
                           >
-                            <Command>                              <CommandInput
-                                placeholder="Bayi ara..."
-                                className="h-8"
-                                value={bayiSearch}
-                                onValueChange={(value) => {
-                                  setBayiSearch(value);
-                                }}
-                              />
-                              <CommandList className="max-h-[160px]">
-                                {isFetching ? (
-                                  <div className="py-2 text-center text-sm">
-                                    Yükleniyor...
-                                  </div>
-                                ) : filteredBayiler.length === 0 ? (
-                                  <CommandEmpty>Bayi bulunamadı.</CommandEmpty>
-                                ) : (
-                                  <CommandGroup>
-                                    {filteredBayiler.map((bayi) => (                                      <CommandItem
-                                        key={bayi.id}
-                                        value={bayi.id.toString()}
-                                        onSelect={() => {
-                                          setSelectedBayi(bayi);
-                                          field.onChange(bayi.unvan);
-                                          setOpenBayi(false);
-                                        }}
-                                        className="text-sm font-medium text-gray-800"
-                                      >
-                                        <Check
-                                          className={cn(
-                                            "mr-2 h-4 w-4",
-                                            filteredBayiler.find((framework) => framework.unvan === field.value)?.unvan === bayi.unvan
-                                              ? "opacity-100"
-                                              : "opacity-0"
-                                          )}
-                                        />
-                                        {bayi.unvan}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                )}
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </FormControl>
-                      <FormMessage className="text-xs" />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              {/* Müşteri Adı */}
-              <div className="flex-1 min-w-[150px] max-w-full">
-                <FormField
-                  control={form.control}
-                  name="musteri_adi"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
-                        Müşteri Adı
-                      </FormLabel>
-                      <FormControl>
-                        <Popover
-                          open={openMusteri}
-                          onOpenChange={(open) => {
-                            setOpenMusteri(open);
-                            if (open) refetchMusteri();
-                          }}
-                        >                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              size="default"
-                              aria-expanded={openMusteri}
-                              className="w-full justify-between text-gray-700"
+                            <span
+                              className={
+                                field.value ? "" : "font-normal text-gray-400"
+                              }
                             >
-                              <span
-                                className={
-                                  field.value ? "" : "font-normal text-gray-400"
-                                }
-                              >
-                                {field.value
-                                  ? field.value
-                                  : "Müşteri Seçiniz..."}
-                              </span>
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-full p-0 border border-gray-400 rounded shadow-sm"
-                            align="start"
-                            sideOffset={4}
-                          >
-                            <Command>
-                              <CommandInput
-                                placeholder="Müşteri ara..."
-                                className="h-8"
-                              />
-                              <CommandList className="max-h-[160px]">
-                                {isFetchingMusteri ? (
-                                  <div className="py-2 text-center text-sm">
-                                    Yükleniyor...
-                                  </div>
-                                ) : musteriler.length === 0 ? (
-                                  <CommandEmpty>
-                                    Müşteri bulunamadı.
-                                  </CommandEmpty>
-                                ) : (
-                                  <CommandGroup>
-                                    {musteriler.map((musteri) => (
-                                      <CommandItem
-                                        key={musteri.id}
-                                        value={musteri.id.toString()}
-                                        onSelect={() => {
-                                          setSelectedMusteri(musteri);
-                                          field.onChange(musteri.unvan);
-                                          setOpenMusteri(false);
-                                        }}
-                                        className="text-sm font-medium text-gray-800"
-                                      >
-                                        <Check
-                                          className={cn(
-                                            "mr-2 h-4 w-4",
-                                            field.value === musteri.unvan
-                                              ? "opacity-100"
-                                              : "opacity-0"
-                                          )}
-                                        />
-                                        {musteri.unvan}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                )}
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </FormControl>
-                      <FormMessage className="text-xs" />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              {/* Paket */}
-              <div className="flex-1 min-w-[150px] max-w-full">
-                <FormField
-                  control={form.control}
-                  name="paket_adi"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
-                        Paket
-                      </FormLabel>
-                      <FormControl>
-                        <Popover
-                          open={openPaket}
-                          onOpenChange={(open) => {
-                            setOpenPaket(open);
-                            if (open) refetchPaketler();
-                          }}
-                        >                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              size="default"
-                              aria-expanded={openPaket}
-                              className="w-full justify-between text-gray-700"
-                            >
-                              <span
-                                className={
-                                  field.value ? "" : "font-normal text-gray-400"
-                                }
-                              >
-                                {field.value ? field.value : "Paket Seçiniz..."}
-                              </span>
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent
-                            className="w-full p-0 border border-gray-400 rounded shadow-sm"
-                            align="start"
-                            sideOffset={4}
-                          >
-                            <Command>
-                              <CommandInput
-                                placeholder="Paket ara..."
-                                className="h-8"
-                              />
-                              <CommandList className="max-h-[160px]">
-                                {isFetchingPaketler ? (
-                                  <div className="py-2 text-center text-sm">
-                                    Yükleniyor...
-                                  </div>
-                                ) : paketler.length === 0 ? (
-                                  <CommandEmpty>Paket bulunamadı.</CommandEmpty>
-                                ) : (
-                                  <CommandGroup>
-                                    {paketler.map((paket) => (
-                                      <CommandItem
-                                        key={paket.id}
-                                        value={paket.id.toString()}
-                                        onSelect={() => {
-                                          setSelectedPaket(paket);
-                                          field.onChange(paket.paket_adi);
-                                          setOpenPaket(false);
-                                          fetchPaketModules(paket.id);
-                                        }}
-                                        className="text-sm font-medium text-gray-800"
-                                      >
-                                        <Check
-                                          className={cn(
-                                            "mr-2 h-4 w-4",
-                                            field.value === paket.paket_adi
-                                              ? "opacity-100"
-                                              : "opacity-0"
-                                          )}
-                                        />
-                                        {paket.paket_adi}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                )}
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      </FormControl>
-                      <FormMessage className="text-xs" />
-                    </FormItem>
-                  )}
-                />
-                
-              </div>
-               {/* Yetkili */}
-              <div className="w-full sm:w-28 max-w-full">
-                <FormField
-                  control={form.control}
-                  name="yetkili"
-                  render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel className="text-slate-700 font-medium text-m">
-                        Yetkili
-                      </FormLabel>{" "}
-                      <FormControl>
-                        <Select
-                          className="w-[180px] max-h-60 overflow-auto"
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                          value={field.value}
-                          {...field}
+                              {field.value
+                                ? field.value
+                                : "Müşteri Seçiniz..."}
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-full p-0 border border-gray-400 rounded shadow-sm"
+                          align="start"
+                          sideOffset={4}
                         >
-                          <SelectTrigger className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200">
-                            <SelectValue placeholder="Yetkili" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="ömür">Ömür</SelectItem>
-                            <SelectItem value="volkan">Volkan</SelectItem>
-                            <SelectItem value="hazar">Hazar</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage className="text-[10px]" />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                          <Command>
+                            <CommandInput
+                              placeholder="Müşteri ara..."
+                              className="h-8"
+                            />
+                            <CommandList className="max-h-[160px]">
+                              {isFetchingMusteri ? (
+                                <div className="py-2 text-center text-sm">
+                                  Yükleniyor...
+                                </div>
+                              ) : musteriler.length === 0 ? (
+                                <CommandEmpty>
+                                  Müşteri bulunamadı.
+                                </CommandEmpty>
+                              ) : (
+                                <CommandGroup>
+                                  {musteriler.map((musteri) => (
+                                    <CommandItem
+                                      key={musteri.id}
+                                      value={musteri.id.toString()}
+                                      onSelect={() => {
+                                        setSelectedMusteri(musteri);
+                                        field.onChange(musteri.unvan);
+                                        setOpenMusteri(false);
+                                      }}
+                                      className="text-sm font-medium text-gray-800"
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          field.value === musteri.unvan
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {musteri.unvan}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              )}
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              
+              {/* Paket */}              <FormField
+                control={form.control}
+                name="paket_adi"
+                render={({ field }) => (                  <FormItem className="flex flex-col gap-1 w-full sm:w-auto">
+                    <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
+                      Paket
+                    </FormLabel>
+                    <FormControl>
+                      <Popover
+                        open={openPaket}
+                        onOpenChange={(open) => {
+                          setOpenPaket(open);
+                          if (open) refetchPaketler();
+                        }}
+                      >
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            size="default"
+                            aria-expanded={openPaket}
+                            className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 w-full justify-between min-h-0"
+                          >
+                            <span
+                              className={
+                                field.value ? "" : "font-normal text-gray-400"
+                              }
+                            >
+                              {field.value ? field.value : "Paket Seçiniz..."}
+                            </span>
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          className="w-full p-0 border border-gray-400 rounded shadow-sm"
+                          align="start"
+                          sideOffset={4}
+                        >
+                          <Command>
+                            <CommandInput
+                              placeholder="Paket ara..."
+                              className="h-8"
+                            />
+                            <CommandList className="max-h-[160px]">
+                              {isFetchingPaketler ? (
+                                <div className="py-2 text-center text-sm">
+                                  Yükleniyor...
+                                </div>
+                              ) : paketler.length === 0 ? (
+                                <CommandEmpty>Paket bulunamadı.</CommandEmpty>
+                              ) : (
+                                <CommandGroup>
+                                  {paketler.map((paket) => (
+                                    <CommandItem
+                                      key={paket.id}
+                                      value={paket.id.toString()}
+                                      onSelect={() => {
+                                        setSelectedPaket(paket);
+                                        field.onChange(paket.paket_adi);
+                                        setOpenPaket(false);
+                                        fetchPaketModules(paket.id);
+                                      }}
+                                      className="text-sm font-medium text-gray-800"
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-4 w-4",
+                                          field.value === paket.paket_adi
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {paket.paket_adi}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              )}
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />                {/* Yetkili */}
+              <FormField
+                control={form.control}
+                name="yetkili"
+                render={({ field }) => (                  <FormItem className="flex flex-col gap-1 w-full sm:w-auto">
+                    <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
+                      Yetkili
+                    </FormLabel>
+                    <FormControl>
+                      <Select
+                        className="w-full overflow-auto"
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        value={field.value}
+                        {...field}
+                      >
+                        <SelectTrigger className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 min-h-0">
+                          <SelectValue placeholder="Yetkili" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="ömür">Ömür</SelectItem>
+                          <SelectItem value="volkan">Volkan</SelectItem>
+                          <SelectItem value="hazar">Hazar</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              
               {/* Kullanıcı Sayısı */}
-              <div className="w-full sm:w-28 max-w-full">
-                <FormField
-                  control={form.control}
-                  name="kullanici_sayisi"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
-                        Kullanıcı Sayısı
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="1"
-                          min={1}
-                          max={100}
-                          defaultValue={1}
-                          className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 placeholder:font-normal placeholder:text-gray-400 min-h-0"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs" />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="kullanici_sayisi"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1 w-full sm:w-28">
+                    <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
+                      Kullanıcı Sayısı
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="1"
+                        min={1}
+                        max={100}
+                        defaultValue={1}
+                        className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 placeholder:font-normal placeholder:text-gray-400 min-h-0"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              
               {/* Lisans Süresi */}
-              <div className="w-full sm:w-28 max-w-full">
-                <FormField
-                  control={form.control}
-                  name="lisans_suresi"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
-                        Lisans Süresi
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Gün"
-                          min={0}
-                          max={365}
-                          defaultValue={0}
-                          value={field.value}
-                          className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 placeholder:font-normal placeholder:text-gray-400 min-h-0"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage className="text-xs" />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="lisans_suresi"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1 w-full sm:w-28">
+                    <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
+                      Lisans Süresi
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="Gün"
+                        min={0}
+                        max={365}
+                        defaultValue={0}
+                        value={field.value}
+                        className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 placeholder:font-normal placeholder:text-gray-400 min-h-0"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              
               {/* Demo */}
-              <div className="w-full sm:w-20 flex flex-col justify-end max-w-full">
-                <FormField
-                  control={form.control}
-                  name="is_demo"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col gap-1">
-                      <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
-                        Demo
-                      </FormLabel>
-                      <FormControl>
-                        <Checkbox
-                          
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                          className="h-8 w-12 border border-gray-400 bg-white shadow-sm mt-0 min-h-0"
-                          {...field}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="is_demo"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1 w-full sm:w-20 flex-col justify-end">
+                    <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
+                      Demo
+                    </FormLabel>
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="h-8 w-12 border border-gray-400 bg-white shadow-sm mt-0 min-h-0"
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </div>
 
             {/* Modüller Başlık */}
-            <div className="py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
+            <div className="py-2 pl-4 border-b bg-cyan-700 mb-4 rounded-t-lg">
               <span className="text-2xl font-bold text-white ">
                 Modüller
               </span>
