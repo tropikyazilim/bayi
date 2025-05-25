@@ -4,6 +4,9 @@ import * as React from "react";
 import { useState, useEffect } from "react";
 import {  useMutation} from "@tanstack/react-query";
 import { ChevronDown } from "lucide-react"; // Dropdown menü ok simgesi için
+import * as XLSX from 'xlsx'; // Excel export işlemleri için
+import { jsPDF } from 'jspdf'; // PDF export işlemleri için
+import autoTable from 'jspdf-autotable'; // PDF'de tablo oluşturmak için
 import { DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner"; // Toast bildirimleri için
 import {
@@ -134,7 +137,8 @@ export default function DemoListesiDataTable({ columns, data, refetch, degerler 
   const { id } = useParams();
   const navigate = useNavigate();
   const [error, setError] = useState(null);
-  const queryClient = useQueryClient();  const [filtering, setFiltering] = useState("");
+  const queryClient = useQueryClient();  
+  const [filtering, setFiltering] = useState("");
   const [columnFilters, setColumnFilters] = useState([]);
   // Store pagination information in state instead of refs
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -143,7 +147,194 @@ export default function DemoListesiDataTable({ columns, data, refetch, degerler 
   // Son güncelleme zamanını tutmak için state
   const [lastUpdateTime, setLastUpdateTime] = useState(null);
   // Sütun görünürlük bilgilerini tutmak için state
-  const [initialColumnVisibility, setInitialColumnVisibility] = useState(null);
+  const [initialColumnVisibility, setInitialColumnVisibility] = useState(null);  // PDF'e aktarma fonksiyonu
+  const exportToPdf = () => {
+    try {
+      // A4 boyutunda yeni bir PDF dokümanı oluştur ve Türkçe dil ayarını belirt
+      const doc = new jsPDF({
+        orientation: 'p', 
+        unit: 'mm', 
+        format: 'a4',
+        language: 'tr' // Türkçe dil ayarı
+      });
+      
+      // Başlık ve tarih bilgisi ekle
+      const now = new Date();
+      const formattedDate = now.toLocaleDateString('tr-TR');
+      doc.setFontSize(18);
+      doc.text('Demo Listesi', 14, 22);
+      doc.setFontSize(11);
+      doc.text(`Oluşturulma Tarihi: ${formattedDate}`, 14, 30);
+      
+      // Tabloda gösterilen verileri hazırla
+      const tableColumns = [];
+      const tableData = [];
+      
+      // Görünür sütunları ve başlıklarını al
+      const visibleColumns = table.getAllColumns()
+        .filter(column => column.getIsVisible() && column.id !== 'actions');
+      
+      // Sütun başlıklarını hazırla
+      visibleColumns.forEach(column => {
+        const header = column.columnDef.header || column.id;
+        tableColumns.push(header);
+      });
+      
+      // Tablo verilerini hazırla
+      table.getFilteredRowModel().rows.forEach(row => {
+        const rowData = [];
+        
+        visibleColumns.forEach(column => {
+          // Hücre değerini al
+          const cell = row.getVisibleCells().find(cell => cell.column.id === column.id);
+          let value = "";
+          
+          if (cell) {
+            const cellValue = cell.getValue();
+            // null veya undefined değilse değeri al
+            value = cellValue !== null && cellValue !== undefined ? cellValue : "";
+          }
+          
+          rowData.push(value);
+        });
+        
+        tableData.push(rowData);
+      });      // autoTable eklentisi ile PDF'e tablo ekle - Türkçe dil desteğiyle
+      autoTable(doc, {
+        head: [tableColumns],
+        body: tableData,
+        startY: 40,
+        styles: {
+          fontSize: 9,
+          cellPadding: 3,
+          lineColor: [200, 200, 200],
+          lineWidth: 0.1,
+          font: 'helvetica', // Türkçe karakter desteği olan font
+        },
+        headStyles: {
+          fillColor: [0, 128, 128],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+        },
+        alternateRowStyles: {
+          fillColor: [240, 240, 240],
+        },
+        margin: { top: 40 },
+        didParseCell: (data) => {
+          // Türkçe karakter desteğini sağla
+          if (data.cell.text) {
+            data.cell.text = data.cell.text.map(text => 
+              typeof text === 'string' ? text : text.toString());
+          }
+        },
+        didDrawPage: (data) => {
+          // Sayfa altında Türkçe bilgileri ekle
+          doc.setFontSize(8);
+          const pageCount = doc.internal.getNumberOfPages();
+          for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.text(`Sayfa ${i} / ${pageCount}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
+          }
+        }
+      });
+        // Dosya adı oluştur - Türkçe tarih formatıyla
+      const turkceFormattedDate = now.toLocaleDateString('tr-TR').replace(/\./g, '-');
+      const fileName = `Demo_Listesi_${turkceFormattedDate}.pdf`;
+      
+      // PDF'i indir
+      doc.save(fileName);
+      
+      // Kullanıcıya bildir
+      toast.success("PDF dosyası başarıyla indirildi", {
+        description: `Dosya adı: ${fileName}`,
+        style: {
+          backgroundColor: "#dcfce7",
+          border: "1px solid #86efac",
+          color: "#166534",
+        },
+      });
+    } catch (error) {
+      console.error("PDF'e aktarma hatası:", error);
+      
+      toast.error("PDF'e aktarma sırasında bir hata oluştu", {
+        description: error.message,
+        style: {
+          backgroundColor: "#fee2e2",
+          border: "1px solid #fca5a5",
+          color: "#991b1b",
+        },
+      });
+    }
+  };
+
+  // Excel'e aktarma fonksiyonu
+  const exportToExcel = () => {
+    try {
+      // Şu anki gösterilen verileri al (filtrelenmiş ve sıralanmış haliyle)
+      const exportData = table.getFilteredRowModel().rows.map(row => {
+        const rowData = {};
+        
+        // Tabloda görünür olan sütunları al
+        table.getAllColumns()
+          .filter(column => column.getIsVisible())
+          .forEach(column => {
+            // Sütun başlığını ve değerini al
+            const header = column.columnDef.header || column.id;
+            
+            // Eğer actions sütunu gibi özel bir sütun ise atla
+            if (column.id === "actions") return;
+            
+            // Hücre değerini al
+            const cell = row.getVisibleCells().find(cell => cell.column.id === column.id);
+            let value = "";
+            
+            if (cell) {
+              const cellValue = cell.getValue();
+              // null veya undefined değilse değeri al
+              value = cellValue !== null && cellValue !== undefined ? cellValue : "";
+            }
+            
+            rowData[header] = value;
+          });
+        
+        return rowData;
+      });
+      
+      // Excel çalışma kitabı oluştur
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Demo Listesi");
+      
+      // Dosya adı oluştur
+      const now = new Date();
+      const formattedDate = now.toISOString().split('T')[0]; // YYYY-MM-DD formatında
+      const fileName = `Demo_Listesi_${formattedDate}.xlsx`;
+      
+      // Excel dosyasını indir
+      XLSX.writeFile(workbook, fileName);
+      
+      // Kullanıcıya bildir
+      toast.success("Excel dosyası başarıyla indirildi", {
+        description: `Dosya adı: ${fileName}`,
+        style: {
+          backgroundColor: "#dcfce7",
+          border: "1px solid #86efac",
+          color: "#166534",
+        },
+      });
+    } catch (error) {
+      console.error("Excel'e aktarma hatası:", error);
+      
+      toast.error("Excel'e aktarma sırasında bir hata oluştu", {
+        description: error.message,
+        style: {
+          backgroundColor: "#fee2e2",
+          border: "1px solid #fca5a5",
+          color: "#991b1b",
+        },
+      });
+    }
+  };
 
   // Parametreleri getirmek için useQuery kullanımı
   const {
@@ -682,8 +873,60 @@ const updateParametersMutation = useMutation({
                 <circle cx="11" cy="11" r="8"></circle>
                 <path d="m21 21-4.3-4.3"></path>
               </svg>
-            }
-          />          <div className="flex items-center gap-4">             <DropdownMenu>
+            }          />          <div className="flex items-center gap-4">
+            <Button 
+              variant="outline" 
+              className="h-8 focus:ring-0 focus:ring-offset-0 focus:outline-none border-slate-300 shadow-none bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 flex items-center"
+              style={{ boxShadow: "none", outline: "none" }}
+              onClick={exportToPdf}
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className="mr-1"
+              >
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path d="M14 2v6h6" />
+                <path d="M16 13H8" />
+                <path d="M16 17H8" />
+                <path d="M10 9H8" />
+              </svg>
+              PDF'e Aktar
+            </Button><Button 
+              variant="outline" 
+              className="h-8 focus:ring-0 focus:ring-offset-0 focus:outline-none border-slate-300 shadow-none bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 flex items-center"
+              style={{ boxShadow: "none", outline: "none" }}
+              onClick={exportToExcel}
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                width="16" 
+                height="16" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round" 
+                className="mr-1"
+              >
+                <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                <polyline points="14 2 14 8 20 8" />
+                <path d="M8 13h2" />
+                <path d="M8 17h2" />
+                <path d="M14 13h2" />
+                <path d="M14 17h2" />
+              </svg>
+              Excel'e Aktar
+            </Button>
+            <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button 
               variant="outline" 
