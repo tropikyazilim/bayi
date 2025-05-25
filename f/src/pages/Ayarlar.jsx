@@ -60,7 +60,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 export default function Ayarlar() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
-  const queryClient = useQueryClient();  const formSchema = z.object({
+  const queryClient = useQueryClient();
+  const formSchema = z.object({
     modul_kodu: z.string().min(1, "Modül kodu gerekli"),
     kullanici_sayisi: z.string().min(1, "Kullanıcı sayısı gerekli"),
     is_demo_ayar: z.enum(["E", "H"]).default("H"),
@@ -73,18 +74,19 @@ export default function Ayarlar() {
       kullanici_sayisi: "",
       is_demo_ayar: "H",
     },
-  });    const updateParametersMutation = useMutation({
+  });
+  const updateParametersMutation = useMutation({
     mutationFn: (parameterData) => {
       console.log("Mutation çağrıldı, gönderilen veri:", parameterData);
-      
+
       // Content-Type header'ı ekleyerek ve stringification yaparak gönderelim
       const dataJson = JSON.stringify(parameterData);
       console.log("Stringified data:", dataJson);
-      
+
       return axios.put("http://localhost:3002/api/ayarlar", dataJson, {
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
     },
     onSuccess: (response) => {
@@ -109,17 +111,18 @@ export default function Ayarlar() {
       console.error("Hata detayları:", {
         message: error.message,
         response: error.response?.data,
-        status: error.response?.status
+        status: error.response?.status,
       });
-      
+
       // Hata detaylarını göster
-      const errorMessage = error.response?.data?.message || 
-                          error.response?.data?.error || 
-                          error.message || 
-                          "Değerler güncellenirken bir hata oluştu";
-      
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Değerler güncellenirken bir hata oluştu";
+
       setError(errorMessage);
-      
+
       toast.error("Hata", {
         description: errorMessage,
         style: {
@@ -130,8 +133,8 @@ export default function Ayarlar() {
       });
       setSuccess(false);
     },
-  });  
-  
+  });
+
   function onSubmit(values) {
     console.log("Form Verileri:", values);
     console.log("Form hataları:", form.formState.errors);
@@ -140,43 +143,44 @@ export default function Ayarlar() {
     // Bu yöntem, sekme değişikliklerinden etkilenmeden, güvenilir şekilde form değerlerini toplar
     const allFormValues = form.getValues();
     console.log("Tüm form değerleri:", allFormValues);
-    
+
     // Doğrudan values nesnesini kullan - bu şekilde zod doğrulaması yapılmış değerleri alırız
     // Bu, beklenmeyen veri tiplerini önler
     const validatedValues = values;
     console.log("Doğrulanmış form değerleri:", validatedValues);
 
     const parametreValues = [];
-    
+
     // Sadece bilinen form alanlarını eşleştir
     const fieldMappings = {
-      "modul_kodu": "1",
-      "kullanici_sayisi": "2",
-      "is_demo_ayar": "3"
+      modul_kodu: "1",
+      kullanici_sayisi: "2",
+      is_demo_ayar: "3",
     };
-      // Form değerlerinden parametre değerlerini oluştur
+    // Form değerlerinden parametre değerlerini oluştur
     Object.keys(fieldMappings).forEach((fieldName) => {
       if (allFormValues[fieldName] !== undefined) {
         const parametreId = fieldMappings[fieldName];
-        
+
         // Switch için özel kontrol
         let degerValue = allFormValues[fieldName];
-        
+
         // Switch değeri için özel işlem
         if (fieldName === "is_demo_ayar") {
           console.log("Switch değeri gönderilmeden önce:", degerValue);
           // Switch değerini E/H formatında gönder
           if (degerValue === true || degerValue === "on") degerValue = "E";
-          else if (degerValue === false || degerValue === "off" || !degerValue) degerValue = "H";
+          else if (degerValue === false || degerValue === "off" || !degerValue)
+            degerValue = "H";
           // Eğer zaten E/H formatında ise dokunma
           console.log("Switch değeri normalize edildi:", degerValue);
         }
-        
-      // Kullanıcı sayısını kontrol et - sayı da olabilir string de
+
+        // Kullanıcı sayısını kontrol et - sayı da olabilir string de
         if (fieldName === "kullanici_sayisi") {
           // Sayısal değeri string olarak gönder - JSON için güvenli format
           degerValue = String(degerValue);
-        }        // JSONB tipine uygun olarak değer hazırla
+        } // JSONB tipine uygun olarak değer hazırla
         // Değeri direk olarak gönder, backend tarafında JSON işlemi yapılacak
         // parametreId de string olmalı
         parametreValues.push({
@@ -237,7 +241,14 @@ export default function Ayarlar() {
                 <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
                   {error}
                 </div>
-              )}              <Tabs defaultValue="moduller" className="w-[800px]">
+              )}{" "}
+              <div className="mb-6">
+              <h1 className="text-2xl font-bold text-white py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
+                Genel Ayarlar
+              </h1>
+              <div className="h-0.5 bg-gray-200 w-full"></div>
+            </div>
+              <Tabs defaultValue="moduller" className="w-[800px]">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="moduller">Modüller</TabsTrigger>
                   <TabsTrigger value="lisanslar">Lisanslar</TabsTrigger>
@@ -292,14 +303,15 @@ export default function Ayarlar() {
                         <FormMessage className="text-[10px]" />
                       </FormItem>
                     )}
-                  />                  <FormField
+                  />{" "}
+                  <FormField
                     control={form.control}
                     name="is_demo_ayar"
                     render={({ field }) => {
                       console.log("Switch field render değeri:", field.value);
                       return (
                         <FormItem id="3" className="space-y-1">
-                          <FormLabel className="text-slate-700 font-medium text-m">
+                          <FormLabel className="text-slate-700 font-medium text-m mt-2">
                             Demo Olarak Başlat
                           </FormLabel>
                           <FormControl>
@@ -309,9 +321,12 @@ export default function Ayarlar() {
                                 onCheckedChange={(checked) => {
                                   console.log("Switch değişti:", checked);
                                   field.onChange(checked ? "E" : "H");
-                                  console.log("Form değeri şimdi:", checked ? "E" : "H");
+                                  console.log(
+                                    "Form değeri şimdi:",
+                                    checked ? "E" : "H"
+                                  );
                                 }}
-                                id="isdemoswitch" 
+                                id="isdemoswitch"
                               />
                               <span className="text-sm text-slate-500">
                                 {field.value === "E" ? "Açık" : "Kapalı"}
@@ -325,7 +340,6 @@ export default function Ayarlar() {
                   />
                 </TabsContent>
               </Tabs>
-
               <div className="flex flex-col justify-end space-y-2 md:space-y-0 md:space-x-2 md:flex-row md:items-end mt-5">
                 <Button
                   type="button"

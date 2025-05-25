@@ -500,386 +500,403 @@ export default function MusteriEkle() {
     },
   });
 
-    function onSubmit(values) {
-      // Form verilerini konsola yazdır
-      console.log("Form Verileri:", values);
+  function onSubmit(values) {
+    // Form verilerini konsola yazdır
+    console.log("Form Verileri:", values);
 
-      // Form doğrulaması sırasında hataları konsola yazdır
-      console.log("Form hataları:", form.formState.errors);
+    // Form doğrulaması sırasında hataları konsola yazdır
+    console.log("Form hataları:", form.formState.errors);
 
-      // API'ye form verilerini gönder
-      setSuccess(false);
-      setError(null);
-      createMusteriMutation.mutate(values);
-    }
+    // API'ye form verilerini gönder
+    setSuccess(false);
+    setError(null);
+    createMusteriMutation.mutate(values);
+  }
 
   return (
     <>
-    <div className="h-full w-full">
-      <div className="h-full w-full p-1">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="bg-white p-4 rounded-lg shadow-md max-h-[calc(100vh-120px)] overflow-y-auto shadow-slate-300  "
-        >
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
-              {error}
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-8">
-            {/* İlk Satır */}
-            <FormField
-              control={form.control}
-              name="unvan"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Ticari Ünvan
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Ticari Ünvan"
-                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[10px]" />
-                </FormItem>
+      <div className="h-full w-full">
+        <div className="h-full w-full p-1">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="bg-white p-4 rounded-lg shadow-md max-h-[calc(100vh-120px)] overflow-y-auto shadow-slate-300  "
+            >
+              {error && (
+                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
+                  {error}
+                </div>
               )}
-            />
-            <FormField
-              control={form.control}
-              name="yetkili"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Yetkili
-                  </FormLabel>{" "}
-                  <FormControl>
-                    <Select
-                      className="w-[180px] max-h-60 overflow-auto"
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      value={field.value}
-                    >
-                      <SelectTrigger className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200">
-                        <SelectValue placeholder="Yetkili" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="ömür">Ömür</SelectItem>
-                        <SelectItem value="volkan">Volkan</SelectItem>
-                        <SelectItem value="hazar">Hazar</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage className="text-[10px]" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="eposta"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    E-Posta
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="E-Posta Giriniz"
-                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[10px]" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="tel"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Telefon
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Telefon Giriniz"
-                      maxLength={10}
-                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[10px]" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="cep_tel"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Cep Telefonu
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Sıfır Olmadan Giriniz"
-                      maxLength={10}
-                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[10px]" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="vergi_dairesi"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Vergi Dairesi
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="Vergi Dairesi"
-                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[10px]" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="vergi_no"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Vergi No
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      minLength={10}
-                      maxLength={11}
-                      placeholder="Vergi No Giriniz"
-                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[10px]" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="il"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    İl
-                  </FormLabel>
-                  <FormControl>
-                    <Popover
-                      open={openIller}
-                      onOpenChange={(open) => {
-                        setOpenIller(open);
-                        if (open) {
-                          refetchCities();
-                        }
-                      }}
-                    >                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          size="default"
-                          aria-expanded={openIller}
-                          className="w-full justify-between text-gray-700"
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-white py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
+                  Müşteri EKle
+                </h1>
+                
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-8">
+                {/* İlk Satır */}
+                <FormField
+                  control={form.control}
+                  name="unvan"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-slate-700 font-medium text-m">
+                        Ticari Ünvan
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Ticari Ünvan"
+                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-[10px]" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="yetkili"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-slate-700 font-medium text-m">
+                        Yetkili
+                      </FormLabel>{" "}
+                      <FormControl>
+                        <Select
+                          className="w-[180px] max-h-60 overflow-auto"
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          value={field.value}
                         >
-                          {field.value
-                            ? iller.find((il) => il.value === field.value)
-                                ?.label
-                            : "İl Seçiniz..."}
-                          <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-full p-0"
-                        align="start"
-                        sideOffset={4}
-                      >
-                        <Command>
-                          <CommandInput
-                            placeholder="İl ara..."
-                            className="h-8"
-                          />
-                          <CommandList className="max-h-[200px]">
-                            <CommandEmpty>İl bulunamadı.</CommandEmpty>
-                            <CommandGroup>
-                              {iller.map((il) => (
-                                <CommandItem
-                                  key={il.value}
-                                  value={il.value}
-                                  onSelect={(currentValue) => {
-                                    field.onChange(currentValue);
-                                    setOpenIller(false);
-                                    setSelectedIl(currentValue);
-                                  }}
-                                  className="text-m"
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-3 w-3",
-                                      field.value === il.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {il.label}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                  <FormMessage className="text-[10px]" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="ilce"
-              render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    İlçe
-                  </FormLabel>
-                  <FormControl>
-                    <Popover open={openIlceler} onOpenChange={setOpenIlceler}>                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          size="default"
-                          aria-expanded={openIlceler}
-                          className="w-full justify-between text-gray-700"
-                          disabled={!selectedIl}
+                          <SelectTrigger className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200">
+                            <SelectValue placeholder="Yetkili" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="ömür">Ömür</SelectItem>
+                            <SelectItem value="volkan">Volkan</SelectItem>
+                            <SelectItem value="hazar">Hazar</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage className="text-[10px]" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="eposta"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-slate-700 font-medium text-m">
+                        E-Posta
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="E-Posta Giriniz"
+                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-[10px]" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="tel"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-slate-700 font-medium text-m">
+                        Telefon
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Telefon Giriniz"
+                          maxLength={10}
+                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-[10px]" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="cep_tel"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-slate-700 font-medium text-m">
+                        Cep Telefonu
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Sıfır Olmadan Giriniz"
+                          maxLength={10}
+                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-[10px]" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="vergi_dairesi"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-slate-700 font-medium text-m">
+                        Vergi Dairesi
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Vergi Dairesi"
+                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-[10px]" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="vergi_no"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-slate-700 font-medium text-m">
+                        Vergi No
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          minLength={10}
+                          maxLength={11}
+                          placeholder="Vergi No Giriniz"
+                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-[10px]" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="il"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-slate-700 font-medium text-m">
+                        İl
+                      </FormLabel>
+                      <FormControl>
+                        <Popover
+                          open={openIller}
+                          onOpenChange={(open) => {
+                            setOpenIller(open);
+                            if (open) {
+                              refetchCities();
+                            }
+                          }}
                         >
-                          {field.value
-                            ? field.value
-                            : selectedIl
-                            ? "İlçe Seçiniz..."
-                            : "Önce İl Seçiniz..."}
-                          <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-full p-0"
-                        align="start"
-                        sideOffset={4}
-                      >
-                        <Command>
-                          <CommandInput
-                            placeholder="İlçe ara..."
-                            className="h-8"
-                          />
-                          <CommandList className="max-h-[200px]">
-                            <CommandEmpty>İlçe bulunamadı.</CommandEmpty>
-                            <CommandGroup>
-                              {ilceler.map((ilce) => (
-                                <CommandItem
-                                  key={ilce.value}
-                                  value={ilce.value}
-                                  onSelect={(currentValue) => {
-                                    field.onChange(currentValue);
-                                    setOpenIlceler(false);
-                                  }}
-                                  className="text-m"
-                                >
-                                  <Check
-                                    className={cn(
-                                      "mr-2 h-3 w-3",
-                                      field.value === ilce.value
-                                        ? "opacity-100"
-                                        : "opacity-0"
-                                    )}
-                                  />
-                                  {ilce.label}
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          </CommandList>
-                        </Command>
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                  <FormMessage className="text-[10px]" />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* Adres ve Butonlar */}
-          <FormField
-            control={form.control}
-            name="adres"
-            render={({ field }) => (
-              <FormItem className="space-y-1 mt-10">
-                <FormLabel className="text-slate-700 font-medium text-m">
-                  Adres
-                </FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Adres"
-                    className="min-h-16 bg-white border-slate-300 focus:border-blue-500 text-m shadow-sm shadow-blue-200"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-[10px]" />
-              </FormItem>
-            )}
-          />
-
-          <div className="flex justify-end space-x-4 pt-8 border-t border-gray-100 mt-4">
-                                        <Button
-                                          type="button"
-                                          onClick={() => {
-                                            form.reset();
-                                            
-                                          }}
-                                          className="bg-red-400 text-white border border-gray-300 hover:bg-red-600 h-11 text-sm rounded-lg px-5 font-medium transition-all shadow-sm flex items-center group"
-                                        >
-                                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-white group-hover:text-white transition-colors" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                          </svg>
-                                          İptal
-                                        </Button>
-
-            <Button
-                              type="submit"
-                              
-                              className="bg-teal-500 hover:bg-teal-600 text-white h-11 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center relative"
+                          {" "}
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              size="default"
+                              aria-expanded={openIller}
+                              className="w-full justify-between text-gray-700"
                             >
-                              Kaydet
+                              {field.value
+                                ? iller.find((il) => il.value === field.value)
+                                    ?.label
+                                : "İl Seçiniz..."}
+                              <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
                             </Button>
-          </div>
-        </form>
-      </Form>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-full p-0"
+                            align="start"
+                            sideOffset={4}
+                          >
+                            <Command>
+                              <CommandInput
+                                placeholder="İl ara..."
+                                className="h-8"
+                              />
+                              <CommandList className="max-h-[200px]">
+                                <CommandEmpty>İl bulunamadı.</CommandEmpty>
+                                <CommandGroup>
+                                  {iller.map((il) => (
+                                    <CommandItem
+                                      key={il.value}
+                                      value={il.value}
+                                      onSelect={(currentValue) => {
+                                        field.onChange(currentValue);
+                                        setOpenIller(false);
+                                        setSelectedIl(currentValue);
+                                      }}
+                                      className="text-m"
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-3 w-3",
+                                          field.value === il.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {il.label}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </FormControl>
+                      <FormMessage className="text-[10px]" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="ilce"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel className="text-slate-700 font-medium text-m">
+                        İlçe
+                      </FormLabel>
+                      <FormControl>
+                        <Popover
+                          open={openIlceler}
+                          onOpenChange={setOpenIlceler}
+                        >
+                          {" "}
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              size="default"
+                              aria-expanded={openIlceler}
+                              className="w-full justify-between text-gray-700"
+                              disabled={!selectedIl}
+                            >
+                              {field.value
+                                ? field.value
+                                : selectedIl
+                                ? "İlçe Seçiniz..."
+                                : "Önce İl Seçiniz..."}
+                              <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent
+                            className="w-full p-0"
+                            align="start"
+                            sideOffset={4}
+                          >
+                            <Command>
+                              <CommandInput
+                                placeholder="İlçe ara..."
+                                className="h-8"
+                              />
+                              <CommandList className="max-h-[200px]">
+                                <CommandEmpty>İlçe bulunamadı.</CommandEmpty>
+                                <CommandGroup>
+                                  {ilceler.map((ilce) => (
+                                    <CommandItem
+                                      key={ilce.value}
+                                      value={ilce.value}
+                                      onSelect={(currentValue) => {
+                                        field.onChange(currentValue);
+                                        setOpenIlceler(false);
+                                      }}
+                                      className="text-m"
+                                    >
+                                      <Check
+                                        className={cn(
+                                          "mr-2 h-3 w-3",
+                                          field.value === ilce.value
+                                            ? "opacity-100"
+                                            : "opacity-0"
+                                        )}
+                                      />
+                                      {ilce.label}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      </FormControl>
+                      <FormMessage className="text-[10px]" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              {/* Adres ve Butonlar */}
+              <FormField
+                control={form.control}
+                name="adres"
+                render={({ field }) => (
+                  <FormItem className="space-y-1 mt-10">
+                    <FormLabel className="text-slate-700 font-medium text-m">
+                      Adres
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Adres"
+                        className="min-h-16 bg-white border-slate-300 focus:border-blue-500 text-m shadow-sm shadow-blue-200"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className="text-[10px]" />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end space-x-4 pt-8 border-t border-gray-100 mt-4">
+                <Button
+                  type="button"
+                  onClick={() => {
+                    form.reset();
+                  }}
+                  className="bg-red-400 text-white border border-gray-300 hover:bg-red-600 h-11 text-sm rounded-lg px-5 font-medium transition-all shadow-sm flex items-center group"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-1.5 text-white group-hover:text-white transition-colors"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  İptal
+                </Button>
+
+                <Button
+                  type="submit"
+                  className="bg-teal-500 hover:bg-teal-600 text-white h-11 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center relative"
+                >
+                  Kaydet
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
       </div>
-    </div>
     </>
   );
 }

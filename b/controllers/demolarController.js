@@ -67,7 +67,7 @@ export async function updateDurum(req, res) {
     }
     
     // Durum değerini kontrol et (opsiyonel güvenlik)
-    const gecerliDurumlar = ["Bekliyor", "Görüşüldü", "Reddedildi", "Onaylandı"];
+    const gecerliDurumlar = ["bekliyor", "gorusuldu", "reddedildi", "onaylandi"];
     if (!gecerliDurumlar.includes(durum)) {
       return res.status(400).json({ message: 'Geçersiz durum değeri' });
     }

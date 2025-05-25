@@ -61,8 +61,15 @@ export function StatusCell({ row, value, table }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const demoId = row.original.id;
   const queryClient = useQueryClient();
-
-  const durumOptions = ["Bekliyor", "Görüşüldü", "Reddedildi", "Onaylandı"];
+  const durumOptions = ["bekliyor", "gorusuldu", "reddedildi", "onaylandi"];
+  
+  // Durum değerlerini Türkçe karşılıklarına çeviren nesne
+  const durumCevirileri = {
+    "bekliyor": "Bekliyor",
+    "gorusuldu": "Görüşüldü",
+    "reddedildi": "Reddedildi",
+    "onaylandi": "Onaylandı"
+  };
 
   const updateDurum = async (newDurum) => {
     if (newDurum === durum) return;
@@ -89,11 +96,11 @@ export function StatusCell({ row, value, table }) {
 
   // Set color based on durum
   const durumStyles = {
-    Bekliyor: "bg-blue-50 text-blue-600 border border-blue-200 rounded-md",
-    Görüşüldü:
+    bekliyor: "bg-blue-50 text-blue-600 border border-blue-200 rounded-md",
+    gorusuldu:
       "bg-purple-50 text-purple-600 border border-purple-200 rounded-md",
-    Reddedildi: "bg-red-50 text-red-400 border border-red-200 rounded-md",
-    Onaylandı: "bg-green-50 text-green-600 border border-green-200 rounded-md",
+    reddedildi: "bg-red-50 text-red-400 border border-red-200 rounded-md",
+    onaylandi: "bg-green-50 text-green-600 border border-green-200 rounded-md",
     default: "bg-gray-50 text-gray-600 border border-gray-200 rounded-md",
   };
   // Stil direkt erişiliyor
@@ -107,10 +114,9 @@ export function StatusCell({ row, value, table }) {
         value={durum}
         onChange={(e) => updateDurum(e.target.value)}
         disabled={isUpdating}
-      >
-        {durumOptions.map((option) => (
+      >        {durumOptions.map((option) => (
           <option key={option} value={option}>
-            {option}
+            {durumCevirileri[option]}
           </option>
         ))}
       </select>
