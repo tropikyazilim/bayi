@@ -128,8 +128,7 @@ export default function DemoListesiDataTable({ columns, data, refetch, degerler 
   const { id } = useParams();
   const navigate = useNavigate();
   const [error, setError] = useState(null);
-  const queryClient = useQueryClient();
-  const [filtering, setFiltering] = useState("");
+  const queryClient = useQueryClient();  const [filtering, setFiltering] = useState("");
   const [columnFilters, setColumnFilters] = useState([]);
   // Store pagination information in state instead of refs
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
@@ -137,6 +136,8 @@ export default function DemoListesiDataTable({ columns, data, refetch, degerler 
   const [success, setSuccess] = useState(false);
   // Son güncelleme zamanını tutmak için state
   const [lastUpdateTime, setLastUpdateTime] = useState(null);
+  // Sütun görünürlük bilgilerini tutmak için state
+  const [initialColumnVisibility, setInitialColumnVisibility] = useState(null);
 
   // Parametreleri getirmek için useQuery kullanımı
   const {
@@ -172,8 +173,8 @@ export default function DemoListesiDataTable({ columns, data, refetch, degerler 
   const [columnSizing, setColumnSizing] = useState({});
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedDemoId, setSelectedDemoId] = useState(null);
-    // Tabloya kaydedilen tasarımı yükleyelim
-  useEffect(() => {
+    // Tabloya kaydedilen tasarımı yükleyelim  
+    useEffect(() => {
     if (parametersData && parametersData.length > 0) {
       // ID'si 4 olan parametreyi bul
       const tasarimParametre = parametersData.find(param => param.parametreid === 4);
@@ -201,6 +202,13 @@ export default function DemoListesiDataTable({ columns, data, refetch, degerler 
           if (tasarimVerisi.columnFilters && tasarimVerisi.columnFilters.length > 0) {
             setColumnFilters(tasarimVerisi.columnFilters);
             console.log("Filtreler yüklendi:", tasarimVerisi.columnFilters);
+          }
+          
+          // Sütun görünürlük ayarlarını sakla, tablo oluşturulduktan sonra uygulanacak
+          if (tasarimVerisi.columnVisibility) {
+            // Bu bilgiyi bir state'e kaydedelim ve tablo oluştuktan sonra uygulayalım
+            setInitialColumnVisibility(tasarimVerisi.columnVisibility);
+            console.log("Sütun görünürlük bilgileri yüklendi:", tasarimVerisi.columnVisibility);
           }
           
           // Sıralama ayarları varsa uygula (table state üzerinden)
@@ -299,6 +307,7 @@ const updateParametersMutation = useMutation({
       }
     };
   }, []);
+  // We'll move the column visibility effect after table initialization
 
   // Effect to handle data changes and maintain pagination state
   React.useEffect(() => {
@@ -426,21 +435,31 @@ const updateParametersMutation = useMutation({
       second: '2-digit'
     }).format(date);
   }
-
   function handleTasarimiKaydet () {
     // Tablo sütun genişlik bilgilerini al (birincil amaç)
     const currentColumnSizing = table.getState().columnSizing;
     
     // Ekstra olarak diğer tablo ayarlarını da kaydedebiliriz
     // Bu sayede kullanıcı tabloyu tam bıraktığı şekilde geri alabilir
-    const currentColumnVisibility = table.getState().columnVisibility || {};
+    
+    // Sütun görünürlük bilgilerini doğrudan tablodan alarak, "Sütun Seçimi" dropdown menüsünden
+    // yapılan değişiklikleri de içerecek şekilde kaydedelim
+    const currentColumnVisibility = {};
+    
+    // Tüm sütunları döngüye alarak her birinin görünürlük durumunu kaydedelim
+    table.getAllColumns().forEach(column => {
+      if (column.getCanHide()) {
+        currentColumnVisibility[column.id] = column.getIsVisible();
+      }
+    });
+    
     const currentColumnFilters = table.getState().columnFilters || [];
     const currentSorting = table.getState().sorting || [];
     const currentColumnOrder = table.getAllLeafColumns().map(column => column.id);
       // Kaydedilecek veri objesini oluştur (kayıt zamanı bilgisini eklemiyoruz)
     const tasarimVerisi = {
       columnSizing: currentColumnSizing, // Sütun genişlikleri
-      columnVisibility: currentColumnVisibility, // Hangi sütunların görünür olduğu
+      columnVisibility: currentColumnVisibility, // Hangi sütunların görünür olduğu (Sütun Seçimi dropdown'ından)
       columnFilters: currentColumnFilters, // Filtreler
       sorting: currentSorting, // Sıralama
       columnOrder: currentColumnOrder // Sütun sıralaması
@@ -477,8 +496,7 @@ const updateParametersMutation = useMutation({
   //tablo yapılandırması
   // Kaydedilmiş sıralama durumunu tablo oluşturulurken kullanmak için state'e alalım
   const [sorting, setSorting] = useState([]);
-  
-  // Kaydedilmiş sıralama bilgilerini yükleme useEffect'i
+    // Kaydedilmiş sıralama bilgilerini yükleme useEffect'i
   useEffect(() => {
     if (parametersData && parametersData.length > 0) {
       const tasarimParametre = parametersData.find(param => param.parametreid === 4);
@@ -497,6 +515,12 @@ const updateParametersMutation = useMutation({
             console.log("Sıralama bilgileri uygulanıyor:", tasarimVerisi.sorting);
             setSorting(tasarimVerisi.sorting);
           }
+
+          // Sütun sıralaması varsa uygula
+          if (tasarimVerisi.columnOrder && tasarimVerisi.columnOrder.length > 0) {
+            console.log("Sütun sıralaması uygulanıyor:", tasarimVerisi.columnOrder);
+            setColumnOrder(tasarimVerisi.columnOrder);
+          }
         } catch (error) {
           console.error("Sıralama bilgileri yüklenirken hata:", error);
         }
@@ -505,8 +529,7 @@ const updateParametersMutation = useMutation({
   }, [parametersData]);
   // Sütun sıralaması için state
   const [columnOrder, setColumnOrder] = useState([]);
-  
-  const table = useReactTable({
+    const table = useReactTable({
     data,
     columns,
     state: {
@@ -516,6 +539,7 @@ const updateParametersMutation = useMutation({
       columnResizeMode,
       sorting, // Kaydedilmiş sıralama bilgilerini kullan
       columnOrder, // Kaydedilmiş sütun sıralamasını kullan
+      columnVisibility: initialColumnVisibility || {}, // Kaydedilmiş sütun görünürlük bilgilerini kullan
       pagination: {
         pageIndex: currentPageIndex,
         pageSize: 10,
@@ -525,9 +549,14 @@ const updateParametersMutation = useMutation({
     enableMultiSort: true,    enableColumnFilters: true,
     onColumnFiltersChange: setColumnFilters,    enableColumnResizing: true,
     columnResizeMode,
-    onColumnSizingChange: setColumnSizing,
-    onSortingChange: setSorting, // Sıralama durumu değiştiğinde bunu state'e kaydet
-    onColumnOrderChange: setColumnOrder, // Sütun sıralaması değiştiğinde bunu state'e kaydet
+    onColumnSizingChange: setColumnSizing,    onSortingChange: setSorting, // Sıralama durumu değiştiğinde bunu state'e kaydet    onColumnOrderChange: setColumnOrder, // Sütun sıralaması değiştiğinde bunu state'e kaydet
+    onColumnVisibilityChange: (updater) => {
+      if (typeof updater === 'function') {
+        setInitialColumnVisibility(updater(table.getState().columnVisibility || {}));
+      } else {
+        setInitialColumnVisibility(updater);
+      }
+    },
     getCoreRowModel: getCoreRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
@@ -552,6 +581,36 @@ const updateParametersMutation = useMutation({
     },
     onGlobalFilterChange: setFiltering,
   });
+
+  // Effect to check column visibility after table initialization
+  React.useEffect(() => {
+    if (table && initialColumnVisibility) {
+      // Log the table's column visibility state
+      console.log("Current table column visibility:", table.getState().columnVisibility);
+      console.log("Initial column visibility that should be applied:", initialColumnVisibility);
+      
+      // Apply the saved visibility settings to all columns
+      const allColumns = table.getAllColumns();
+      console.log("All available columns:", allColumns.map(col => col.id));
+      
+      // Ensure visibility settings are applied
+      Object.keys(initialColumnVisibility).forEach(columnId => {
+        const column = table.getColumn(columnId);
+        if (column) {
+          const shouldBeVisible = initialColumnVisibility[columnId];
+          const isCurrentlyVisible = column.getIsVisible();
+          console.log(`Column ${columnId}: Should be ${shouldBeVisible ? 'visible' : 'hidden'}, Currently ${isCurrentlyVisible ? 'visible' : 'hidden'}`);
+          
+          // If visibility doesn't match, update it
+          if (isCurrentlyVisible !== shouldBeVisible) {
+            column.toggleVisibility(shouldBeVisible);
+            console.log(`Changed visibility of ${columnId} to ${shouldBeVisible}`);
+          }
+        }
+      });
+    }
+  }, [table, initialColumnVisibility]);
+  
   // Effect to synchronize the current page index with table state
   React.useEffect(() => {
     const tablePageIndex = table.getState().pagination.pageIndex;
@@ -618,11 +677,13 @@ const updateParametersMutation = useMutation({
                 <path d="m21 21-4.3-4.3"></path>
               </svg>
             }
-          />
-          <div>
-             <DropdownMenu>
+          />          <div className="flex items-center gap-4">             <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button 
+              variant="outline" 
+              className="h-8 focus:ring-0 focus:ring-offset-0 focus:outline-none border-slate-300 shadow-none"
+              style={{ boxShadow: "none", outline: "none" }}
+            >
               Sütun Seçimi <ChevronDown />
             </Button>
           </DropdownMenuTrigger>
@@ -648,7 +709,11 @@ const updateParametersMutation = useMutation({
         </DropdownMenu>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline">İşlemler</Button>
+                <Button 
+                  variant="outline" 
+                  className="h-8 focus:ring-0 focus:ring-offset-0 focus:outline-none border-slate-300 shadow-none"
+                  style={{ boxShadow: "none", outline: "none" }}
+                >İşlemler</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56">                <DropdownMenuLabel>Tablo Ayarları</DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -676,12 +741,26 @@ const updateParametersMutation = useMutation({
               </DropdownMenuContent>
             </DropdownMenu>
             <Button
-              className={
-                "bg-emerald-500 hover:bg-emerald-600 active:bg-cyan-700 h-8 w-20 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200"
-              }
+              className="bg-emerald-500 hover:bg-emerald-600 active:bg-cyan-700 h-9 w-28 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200 flex items-center justify-center"
               onClick={() => refetch()}
             >
-              Yenile
+             <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mr-1"
+            >
+              <path d="M1 4v6h6"></path>
+              <path d="M23 20v-6h-6"></path>
+              <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+            </svg>
+            Yenile
             </Button>
           </div>
         </div>
@@ -1045,8 +1124,7 @@ const updateParametersMutation = useMutation({
                     })}
                   </TableRow>
                 ))
-              ) : (
-                <TableRow>
+              ) : (                <TableRow>
                   <TableCell
                     colSpan={columns.length}
                     className="h-24 text-center"

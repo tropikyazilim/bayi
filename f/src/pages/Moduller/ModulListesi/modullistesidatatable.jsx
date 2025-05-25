@@ -146,8 +146,7 @@ export default function ModulListesiDataTable({ columns, data }) {
 
       {/* Tablo ve Scroll Container - Tek bir scroll container */}      <div className="rounded-md border overflow-x-auto" style={{ minWidth: "100%" }}>
         <div style={{ minWidth: "1200px" }}>
-          <Table style={{ tableLayout: "fixed", width: "100%" }}>
-            <TableHeader className="bg-cyan-700">
+          <Table style={{ tableLayout: "fixed", width: "100%" }}>            <TableHeader className="bg-cyan-700">
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id} className="hover:bg-cyan-700">
                   {headerGroup.headers.map((header) => (
@@ -160,15 +159,20 @@ export default function ModulListesiDataTable({ columns, data }) {
                           )}
                     </TableHead>
                   ))}
+                  <TableHead className="text-white bg-cyan-700 text-left">İşlemler</TableHead>
                 </TableRow>
               ))}
             </TableHeader>
             <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
+              {table.getRowModel().rows?.length ? (                table.getRowModel().rows.map((row, rowIndex) => (
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
+                    className={
+                      rowIndex % 2 === 0
+                        ? "bg-white hover:bg-[#e1f0f5]"
+                        : "bg-[#eaf5fa] hover:bg-[#d0e8f0]"
+                    }
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
@@ -180,9 +184,7 @@ export default function ModulListesiDataTable({ columns, data }) {
                     ))}
                     <TableCell className="flex justify-end gap-2">                    
                       <Button
-                      className={"bg-[#FE5D26] text-white hover:bg-[#F2C078] font-medium rounded-lg transition-all duration-200 px-5 py-2.5 flex items-center"}
-                        variant="info"
-                        size="sm"
+                      className="bg-fuchsia-600 text-white border border-gray-300 hover:bg-cyan-600 h-10 text-sm rounded-lg px-5 font-medium transition-all shadow-sm flex items-center group"
                         onClick={() => {
                           navigate(`/modulduzenle/${row.original.id}`);
                           console.log("Row clicked:", row.original);
@@ -199,23 +201,12 @@ export default function ModulListesiDataTable({ columns, data }) {
                             row.original.id
                           );
                         }}
-                        variant="destructive"
-                        size="sm"
+                        className="bg-red-400 text-white border border-gray-300 hover:bg-red-600 h-10 text-sm rounded-lg px-5 font-medium transition-all shadow-sm flex items-center group"
+                        
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 mr-2"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-white group-hover:text-white transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                </svg>
                         Sil
                       </Button>
                     </TableCell>

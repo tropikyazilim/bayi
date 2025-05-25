@@ -13,7 +13,15 @@ export const mustericolums = [
     accessorKey: "unvan",
     header: "Ticari Ünvan",
     size: 250,
-    minSize: 250
+    minSize: 250,
+            cell: ({ row }) => {
+      const value = row.getValue("unvan");
+      return value ? (
+        <div className="max-w-[180px] truncate" title={value}>
+          {value}
+        </div>
+      ) : null;
+    }
   },
     {
     accessorKey: "yetkili",
@@ -71,7 +79,15 @@ export const mustericolums = [
     header: "Adres",
     size: 100,
     minSize: 100,
-    maxSize: 120
+    maxSize: 120,
+            cell: ({ row }) => {
+      const value = row.getValue("adres");
+      return value ? (
+        <div className="max-w-[180px] truncate" title={value}>
+          {value}
+        </div>
+      ) : null;
+    }
   },
 ];
   

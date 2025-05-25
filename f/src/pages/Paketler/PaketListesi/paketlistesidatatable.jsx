@@ -114,8 +114,8 @@ export function PaketListesiDataTable({ columns, data }) {
                     data-state={row.getIsSelected() && "selected"}
                     className={
                       index % 2 === 0
-                        ? "bg-white hover:bg-[#e1f0f5]"
-                        : "bg-[#eaf5fa] hover:bg-[#d0e8f0]"
+                        ? "bg-white hover:bg-[#e1f0f5] h-12"
+                        : "bg-[#eaf5fa] hover:bg-[#d0e8f0] h-12"
                     }
                   >
                     {row.getVisibleCells().map((cell) => (

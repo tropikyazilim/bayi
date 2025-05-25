@@ -102,7 +102,7 @@ export default function LisansEkle() {
   const {
     data: parametersData,
     isLoading,
-    error: queryError
+    error: queryError,
   } = useQuery({
     queryKey: ["parametreler"],
     queryFn: async () => {
@@ -117,8 +117,6 @@ export default function LisansEkle() {
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
-
-
 
   // Form tanımlaması
   const form = useForm({
@@ -139,18 +137,26 @@ export default function LisansEkle() {
   useEffect(() => {
     if (parametersData && parametersData.length > 0) {
       // parametre idsine göre ilgili alanları doldur
-      
-      const lisansEkleAyarParam = parametersData.find(param => param.parametreid === 2);
-      const lisansEkleAyarDemoParam = parametersData.find(param => param.parametreid === 3);
+
+      const lisansEkleAyarParam = parametersData.find(
+        (param) => param.parametreid === 2
+      );
+      const lisansEkleAyarDemoParam = parametersData.find(
+        (param) => param.parametreid === 3
+      );
       if (lisansEkleAyarParam && lisansEkleAyarDemoParam) {
         form.setValue("kullanici_sayisi", lisansEkleAyarParam.deger);
-        form.setValue("is_demo", lisansEkleAyarDemoParam.deger === "E" ? true : false);
-        console.log("Kullanıcı sayısı alanı otomatik olarak dolduruldu:", lisansEkleAyarParam.deger);
+        form.setValue(
+          "is_demo",
+          lisansEkleAyarDemoParam.deger === "E" ? true : false
+        );
+        console.log(
+          "Kullanıcı sayısı alanı otomatik olarak dolduruldu:",
+          lisansEkleAyarParam.deger
+        );
       }
     }
   }, [parametersData, form]);
-
-
 
   //modülleri getirmek için useQuery kullanımı
   const {
@@ -467,8 +473,10 @@ export default function LisansEkle() {
   const filteredBayiler =
     bayiSearch.trim() === ""
       ? bayiler
-      : bayiler.filter((bayi) =>
-          bayi.unvan && bayi.unvan.toLowerCase().includes(bayiSearch.toLowerCase())
+      : bayiler.filter(
+          (bayi) =>
+            bayi.unvan &&
+            bayi.unvan.toLowerCase().includes(bayiSearch.toLowerCase())
         );
 
   return (
@@ -484,18 +492,17 @@ export default function LisansEkle() {
                 {error}
               </div>
             )}
-
             {/* Lisans Bilgileri Başlık */}
             <div className="py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
               <span className="text-2xl font-bold text-white ">
-                LİSANS BİLGİLERİ
+                Lisans Bilgileri
               </span>
-              
-              
             </div>
-
-            {/* Lisans Bilgileri Form Alanları */}            <div className="w-full flex flex-col md:flex-row flex-wrap gap-4 items-stretch md:items-end my-4">
-              {/* Bayi */}              <FormField                control={form.control}
+            {/* Lisans Bilgileri Form Alanları */}{" "}
+            <div className="w-full flex flex-col md:flex-row flex-wrap gap-4 items-stretch md:items-end my-4">
+              {/* Bayi */}{" "}
+              <FormField
+                control={form.control}
                 name="bayi_adi"
                 render={({ field }) => (
                   <FormItem className="flex flex-col gap-1 w-full sm:w-auto">
@@ -565,7 +572,10 @@ export default function LisansEkle() {
                                       <Check
                                         className={cn(
                                           "mr-2 h-4 w-4",
-                                          filteredBayiler.find((framework) => framework.unvan === field.value)?.unvan === bayi.unvan
+                                          filteredBayiler.find(
+                                            (framework) =>
+                                              framework.unvan === field.value
+                                          )?.unvan === bayi.unvan
                                             ? "opacity-100"
                                             : "opacity-0"
                                         )}
@@ -584,11 +594,12 @@ export default function LisansEkle() {
                   </FormItem>
                 )}
               />
-              
-              {/* Müşteri Adı */}              <FormField
+              {/* Müşteri Adı */}{" "}
+              <FormField
                 control={form.control}
                 name="musteri_adi"
-                render={({ field }) => (                  <FormItem className="flex flex-col gap-1 w-full sm:w-auto">
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1 w-full sm:w-auto">
                     <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
                       Müşteri Adı
                     </FormLabel>
@@ -613,9 +624,7 @@ export default function LisansEkle() {
                                 field.value ? "" : "font-normal text-gray-400"
                               }
                             >
-                              {field.value
-                                ? field.value
-                                : "Müşteri Seçiniz..."}
+                              {field.value ? field.value : "Müşteri Seçiniz..."}
                             </span>
                             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                           </Button>
@@ -636,9 +645,7 @@ export default function LisansEkle() {
                                   Yükleniyor...
                                 </div>
                               ) : musteriler.length === 0 ? (
-                                <CommandEmpty>
-                                  Müşteri bulunamadı.
-                                </CommandEmpty>
+                                <CommandEmpty>Müşteri bulunamadı.</CommandEmpty>
                               ) : (
                                 <CommandGroup>
                                   {musteriler.map((musteri) => (
@@ -674,11 +681,12 @@ export default function LisansEkle() {
                   </FormItem>
                 )}
               />
-              
-              {/* Paket */}              <FormField
+              {/* Paket */}{" "}
+              <FormField
                 control={form.control}
                 name="paket_adi"
-                render={({ field }) => (                  <FormItem className="flex flex-col gap-1 w-full sm:w-auto">
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1 w-full sm:w-auto">
                     <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
                       Paket
                     </FormLabel>
@@ -760,11 +768,13 @@ export default function LisansEkle() {
                     <FormMessage className="text-xs" />
                   </FormItem>
                 )}
-              />                {/* Yetkili */}
+              />{" "}
+              {/* Yetkili */}
               <FormField
                 control={form.control}
                 name="yetkili"
-                render={({ field }) => (                  <FormItem className="flex flex-col gap-1 w-full sm:w-auto">
+                render={({ field }) => (
+                  <FormItem className="flex flex-col gap-1 w-full sm:w-auto">
                     <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
                       Yetkili
                     </FormLabel>
@@ -790,7 +800,6 @@ export default function LisansEkle() {
                   </FormItem>
                 )}
               />
-              
               {/* Kullanıcı Sayısı */}
               <FormField
                 control={form.control}
@@ -815,7 +824,6 @@ export default function LisansEkle() {
                   </FormItem>
                 )}
               />
-              
               {/* Lisans Süresi */}
               <FormField
                 control={form.control}
@@ -841,21 +849,19 @@ export default function LisansEkle() {
                   </FormItem>
                 )}
               />
-              
               {/* Demo */}
               <FormField
                 control={form.control}
                 name="is_demo"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col gap-1 w-full sm:w-20 flex-col justify-end">
+                  <FormItem className="flex flex-col gap-1 w-full sm:w-20  justify-end">
                     <FormLabel className="text-base font-semibold text-gray-700 mb-0.5 tracking-tight">
                       Demo
-                    </FormLabel>
-                    <FormControl>
+                    </FormLabel>                    <FormControl>
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}
-                        className="h-8 w-12 border border-gray-400 bg-white shadow-sm mt-0 min-h-0"
+                        className="h-8 w-12 border border-gray-400 bg-white shadow-sm mt-0 min-h-0 data-[state=checked]:bg-cyan-700 data-[state=checked]:border-cyan-700"
                         {...field}
                       />
                     </FormControl>
@@ -863,18 +869,14 @@ export default function LisansEkle() {
                 )}
               />
             </div>
-
             {/* Modüller Başlık */}
             <div className="py-2 pl-4 border-b bg-cyan-700 mb-4 rounded-t-lg">
-              <span className="text-2xl font-bold text-white ">
-                Modüller
-              </span>
+              <span className="text-2xl font-bold text-white ">Modüller</span>
               <span className="hidden md:inline h-8 w-0.5 bg-gray-500 mx-4 rounded-full" />
               <span className="text-white text-sm md:text-base font-medium mt-1 md:mt-0">
                 Paket için kullanılabilir modülleri seçiniz.
               </span>
             </div>
-
             {/* Modüller Checkbox Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
               {(modulPaketDuzenleData || []).map((item) => (
@@ -910,21 +912,23 @@ export default function LisansEkle() {
                 />
               ))}
             </div>
-
             {/* Butonlar */}
-            <div className="flex flex-col justify-end space-y-2 md:space-y-0 md:space-x-3 md:flex-row md:items-end mt-5">              <Button
-                type="button"
-                onClick={() => form.reset()}
-                variant="secondary"
-                size="lg"
-              >
-                İptal
-              </Button>
+            <div className="flex justify-end space-x-4 pt-8 border-t border-gray-100 mt-4">
+              {" "}
               <Button
-                type="submit"
-                variant="default"
-                size="lg"
-              >
+                                  type="button"
+                                  onClick={() => {
+                                    form.reset();
+                                    navigate("/demolistesi/");
+                                  }}
+                                  className="bg-red-400 text-white border border-gray-300 hover:bg-red-600 h-11 text-sm rounded-lg px-5 font-medium transition-all shadow-sm flex items-center group"
+                                >
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-white group-hover:text-white transition-colors" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                  </svg>
+                                  İptal
+                                </Button>
+              <Button type="submit"  className="bg-teal-500 hover:bg-teal-600 text-white h-11 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center relative">
                 Kaydet
               </Button>
             </div>

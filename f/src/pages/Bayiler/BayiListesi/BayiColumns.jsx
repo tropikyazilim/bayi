@@ -13,18 +13,10 @@ export const columns = [
   },
   {
     accessorKey: "bayi_kodu",
-    header: ({ column }) => (      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="w-full justify-center py-2 font-semibold text-gray-700 hover:text-gray-900"
-      >
-        Bayi Kodu
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
-    size: 110,
+    header: "Bayi Kodu",
+    size: 120,
     minSize: 110,
-    maxSize: 130
+    maxSize: 140
   },
   {
     accessorKey: "bayi_sifre",
@@ -35,15 +27,7 @@ export const columns = [
   },
   {
     accessorKey: "unvan",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Ünvan
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Bayi Ünvan",
     size: 180,
     minSize: 150,
     maxSize: 200,
@@ -65,15 +49,7 @@ export const columns = [
   },
   {
     accessorKey: "bayi_tipi",
-    header: ({ column }) => (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Bayi Tipi
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
+    header: "Bayi Tipi",
     size: 110,
     minSize: 110,
     maxSize: 140
@@ -83,7 +59,15 @@ export const columns = [
     header: "İl",
     size: 90,
     minSize: 90,
-    maxSize: 120
+    maxSize: 120,
+        cell: ({ row }) => {
+      const value = row.getValue("il");
+      return value ? (
+        <div className="max-w-[180px] truncate" title={value}>
+          {value}
+        </div>
+      ) : null;
+    }
   },
   {
     accessorKey: "ilce",
@@ -112,7 +96,15 @@ export const columns = [
     header: "E-posta",
     size: 130,
     minSize: 130,
-    maxSize: 180
+    maxSize: 180,
+        cell: ({ row }) => {
+      const value = row.getValue("eposta");
+      return value ? (
+        <div className="max-w-[180px] truncate" title={value}>
+          {value}
+        </div>
+      ) : null;
+    }
   },
   {
     accessorKey: "telefon",
@@ -148,6 +140,14 @@ export const columns = [
     header: "Üst Bayi",
     size: 130,
     minSize: 130,
-    maxSize: 180
+    maxSize: 180,
+    cell: ({ row }) => {
+      const value = row.getValue("ust_bayi");
+      return value ? (
+        <div className="max-w-[180px] truncate" title={value}>
+          {value}
+        </div>
+      ) : null;
+    }
   }
 ];

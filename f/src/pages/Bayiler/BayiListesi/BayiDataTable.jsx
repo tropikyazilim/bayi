@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import * as React from "react" // React import eklendi
+import { useState, useEffect } from "react";
+import * as React from "react"; // React import eklendi
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "sonner";
@@ -16,7 +16,7 @@ import {
   getSortedRowModel,
   getFilteredRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -25,76 +25,99 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 
-import { Label } from "@radix-ui/react-label"
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
+import { Label } from "@radix-ui/react-label";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 
 export function DataTable({ columns, data, refetch }) {
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
   const [filterParams, setFilterParams] = useState({}); // Filtreleme parametrelerini saklayacak state
   const queryClient = useQueryClient(); // QueryClient'ı al
   // Tablonun kullanacağı verileri yönetmek için state
   const [tableData, setTableData] = useState(data || []);
-  const [filtering, setFiltering] = useState("");  
-  
+  const [filtering, setFiltering] = useState("");
+
   const form = useForm({
     defaultValues: {
       bayi_kodu: "",
       unvan: "",
       firma_sahibi: "",
-    },  });
-  const navigate = useNavigate(); // Hook fonksiyon içine taşındı  
+    },
+  });
+  const navigate = useNavigate(); // Hook fonksiyon içine taşındı
   const { id } = useParams(); // URL'den id parametresini al
-  
+
   // Bu sayede başka bir sayfada bayiler güncellendiğinde bu liste de güncellenecek
   React.useEffect(() => {
     // data prop'u değiştiğinde ve içeriği varsa, ana veriyi direkt kullan (API isteği yapmadan)
     if (data?.length > 0) {
-      console.log("Data prop'u değişti, filtrelemesiz tablo verilerini güncelliyorum");
-      
+      console.log(
+        "Data prop'u değişti, filtrelemesiz tablo verilerini güncelliyorum"
+      );
+
       // Eğer aktif bir filtreleme işlemi yoksa data prop'unu kullan
-      const hasActiveFilters = Object.values(filterParams).some(val => val && val !== '');
+      const hasActiveFilters = Object.values(filterParams).some(
+        (val) => val && val !== ""
+      );
       if (!hasActiveFilters) {
         // Filtreleme yok, ana veriyi kullan
-        queryClient.setQueryData(['filteredBayiler', {}], data);
+        queryClient.setQueryData(["filteredBayiler", {}], data);
         console.log("Filtre yok, ana veri direkt kullanıldı");
       } else {
         console.log("Aktif filtre var, ana veri güncellenmedi");
       }
-    }  }, [data, queryClient, filterParams]);
-  
+    }
+  }, [data, queryClient, filterParams]);
+
   // React Query ile filtrelenmiş veri çekme
-  const { data: filteredData, isLoading, isRefetching } = useQuery({
-    queryKey: ['filteredBayiler', filterParams],
+  const {
+    data: filteredData,
+    isLoading,
+    isRefetching,
+  } = useQuery({
+    queryKey: ["filteredBayiler", filterParams],
     queryFn: async () => {
       try {
         // Filtreleme parametreleri var mı kontrol et
-        const hasFilters = Object.values(filterParams).some(val => val && val !== '');
-        
+        const hasFilters = Object.values(filterParams).some(
+          (val) => val && val !== ""
+        );
+
         if (hasFilters) {
           // Boş olmayan parametreleri URL'ye ekle
           const queryParams = new URLSearchParams();
-          
+
           Object.entries(filterParams).forEach(([key, value]) => {
             if (value) {
               queryParams.append(key, value);
             }
           });
-          
+
           console.log("Filtreleme isteği yapılıyor", queryParams.toString());
           // Filtreleme API'sine istek gönder
-          const response = await axios.get(`http://localhost:3002/api/bayiler/filter?${queryParams.toString()}`);
-          
+          const response = await axios.get(
+            `http://localhost:3002/api/bayiler/filter?${queryParams.toString()}`
+          );
+
           // Kullanıcıya sonucu bildir
           if (response.data.length === 0) {
             toast.info("Filtreleme sonucu", {
               description: "Arama kriterlerine uygun kayıt bulunamadı.",
             });
           } else {
-            console.log(`Filtreleme sonucu: ${response.data.length} kayıt bulundu`);
+            console.log(
+              `Filtreleme sonucu: ${response.data.length} kayıt bulundu`
+            );
           }
-          
+
           return response.data;
         } else {
           // Filtre yoksa mevcut verileri kullan
@@ -103,13 +126,17 @@ export function DataTable({ columns, data, refetch }) {
         }
       } catch (error) {
         console.error("Veri çekme hatası:", error);
-        setError("Veriler çekilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+        setError(
+          "Veriler çekilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+        );
         toast.error("Veri çekme hatası", {
-          description: error.response?.data?.message || "Veriler çekilirken bir hata oluştu.",
+          description:
+            error.response?.data?.message ||
+            "Veriler çekilirken bir hata oluştu.",
         });
         throw error;
       }
-    },    // Her zaman etkin olsun
+    }, // Her zaman etkin olsun
     enabled: true,
     // Başlangıçta data prop'unu kullan
     initialData: data,
@@ -122,33 +149,41 @@ export function DataTable({ columns, data, refetch }) {
     // Stale time'ı azalt - hemen yeniden çekilebilsin
     staleTime: 0,
     // Cache süresi
-    cacheTime: 5 * 60 * 1000
+    cacheTime: 5 * 60 * 1000,
   });
-  
+
   // Form gönderildiğinde çalışacak fonksiyon
   function onSubmit(values) {
     console.log("Form Verileri:", values);
-    
+
     // Filtreleme parametrelerini temizle (boşluk içerenleri kaldır)
     const cleanedValues = Object.fromEntries(
-      Object.entries(values).map(([key, val]) => [key, typeof val === 'string' ? val.trim() : val])
+      Object.entries(values).map(([key, val]) => [
+        key,
+        typeof val === "string" ? val.trim() : val,
+      ])
     );
-    
+
     // Filtreleme parametreleri var mı kontrol et
-    const hasFilters = Object.values(cleanedValues).some(val => val && val !== '');
-    
+    const hasFilters = Object.values(cleanedValues).some(
+      (val) => val && val !== ""
+    );
+
     if (hasFilters) {
       // Filtreleme parametreleri varsa, bunlarla filtreleme yap
-      console.log("Filtre parametreleri var, filtreleme sorgusu yapılacak", cleanedValues);
-      
+      console.log(
+        "Filtre parametreleri var, filtreleme sorgusu yapılacak",
+        cleanedValues
+      );
+
       // Önce mevcut durumu temizle
-      queryClient.removeQueries(['filteredBayiler']);
-      
+      queryClient.removeQueries(["filteredBayiler"]);
+
       // Sonra filtre parametrelerini ayarla
       setFilterParams(cleanedValues);
-        // Manuel olarak yeni sorgu başlat
+      // Manuel olarak yeni sorgu başlat
       queryClient.fetchQuery({
-        queryKey: ['filteredBayiler', cleanedValues],
+        queryKey: ["filteredBayiler", cleanedValues],
         queryFn: async () => {
           const queryParams = new URLSearchParams();
           Object.entries(cleanedValues).forEach(([key, value]) => {
@@ -156,32 +191,35 @@ export function DataTable({ columns, data, refetch }) {
               queryParams.append(key, value);
             }
           });
-          
+
           console.log("Manuel filtreleme isteği yapılıyor");
-          const response = await axios.get(`http://localhost:3002/api/bayiler/filter?${queryParams.toString()}`);
-          
+          const response = await axios.get(
+            `http://localhost:3002/api/bayiler/filter?${queryParams.toString()}`
+          );
+
           // Sorgudan gelen verileri direkt olarak TableData'ya da ayarlayalım
           setTableData(response.data);
           console.log("tableData manuel güncellendi:", response.data.length);
-          
+
           return response.data;
-        }
-      });    } else {
+        },
+      });
+    } else {
       // Filtre yoksa, filterParams'ı sıfırla ve mevcut verileri göster
       console.log("Filtre parametreleri yok, tüm verileri göster");
       setFilterParams({});
-      
+
       // Mevcut verileri direkt kullan
       if (data) {
         // Önbelleği güncelle
-        queryClient.setQueryData(['filteredBayiler', {}], data);
+        queryClient.setQueryData(["filteredBayiler", {}], data);
         // TableData'yı da güncelle
         setTableData(data);
         console.log("tableData filtresiz güncellendi:", data.length);
       }
     }
   }
-  
+
   // Herhangi bir işlem yapıldığında verileri yenilemek için kullanılabilecek fonksiyon
   const refreshData = () => {
     console.log("Yenileme butonu tıklandı");
@@ -191,41 +229,43 @@ export function DataTable({ columns, data, refetch }) {
       unvan: "",
       firma_sahibi: "",
     });
-    
+
     // Filtreleri temizle
     setFilterParams({});
-    
+
     // Önbelleği temizle ve veriyi ana kaynaktan yenile
-    queryClient.removeQueries(['filteredBayiler']);
-      // Ana listeyi yenile (Bu tek API isteği yapacak)
+    queryClient.removeQueries(["filteredBayiler"]);
+    // Ana listeyi yenile (Bu tek API isteği yapacak)
     refetch().then((result) => {
       if (result.data) {
         // Yeni veri geldiğinde filtresiz sorguya kaydet
-        queryClient.setQueryData(['filteredBayiler', {}], result.data);
-        
+        queryClient.setQueryData(["filteredBayiler", {}], result.data);
+
         // TableData'yı da güncelle
         setTableData(result.data);
         console.log("tableData yenilemede güncellendi:", result.data.length);
-        
+
         toast.success("Veriler güncellendi", {
           description: `${result.data.length} kayıt başarıyla yenilendi.`,
         });
       }
     });
-  };  // filteredData değiştiğinde tableData'yı güncelle
+  }; // filteredData değiştiğinde tableData'yı güncelle
   React.useEffect(() => {
     if (filteredData !== undefined && filteredData !== null) {
       console.log("filteredData değişti:", filteredData.length);
       setTableData(filteredData);
-    }    // ...existing code...
-              {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
-                  {error}
-                </div>
-              )}
+    } // ...existing code...
+    {
+      error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
+          {error}
+        </div>
+      );
+    }
     // ...existing code...
   }, [filteredData]);
-  
+
   // Table yapılandırması - tableData kullanarak tabloyu güncelleyelim
   const table = useReactTable({
     data: tableData, // State üzerinden veri kullan (filteredData değil)
@@ -243,12 +283,12 @@ export function DataTable({ columns, data, refetch }) {
       globalFilter: filtering,
     },
     onGlobalFilterChange: setFiltering,
-  })
-    // Bu useEffect kaldırıldı çünkü yukarıdaki useEffect ile aynı işlevi görüyor
+  });
+  // Bu useEffect kaldırıldı çünkü yukarıdaki useEffect ile aynı işlevi görüyor
 
   return (
     <div className="h-full flex flex-col">
-       <Form {...form}>
+      <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="bg-white p-0   max-h-[calc(100vh-120px)] overflow-y-auto shadow-slate-300  "
@@ -266,97 +306,123 @@ export function DataTable({ columns, data, refetch }) {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-3 pb-2">
-            
-                  <FormField
-                    control={form.control}
-                    name="bayi_kodu"
-                    render={({ field }) => (
-                    <FormItem className="space-y-1 ">
-                      <FormLabel className="text-slate-700 font-medium text-m">
-                      Bayi Kodu
-                      </FormLabel>
-                      <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="Bayi Kodu"
-                        className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
-                        {...field}
-                      />
-                      </FormControl>
-                      <FormMessage className="text-[10px]" />
-                    </FormItem>
-                    )}
-                  />
+            <FormField
+              control={form.control}
+              name="bayi_kodu"
+              render={({ field }) => (
+                <FormItem className="space-y-1 ">
+                  <FormLabel className="text-slate-700 font-medium text-m">
+                    Bayi Kodu
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Bayi Kodu"
+                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-[10px]" />
+                </FormItem>
+              )}
+            />
 
-                  <FormField
-                    control={form.control}
-                    name="unvan"
-                    render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel className="text-slate-700 font-medium text-m">
-                      Ticari Ünvan
-                      </FormLabel>
-                      <FormControl>
-                      <Input
-                        type="text"
-                        
-                        placeholder="Ticari Ünvan"
-                        className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
-                        {...field}
-                      />
-                      </FormControl>
-                      <FormMessage className="text-[10px]" />
-                    </FormItem>
-                    )}
-                  />
+            <FormField
+              control={form.control}
+              name="unvan"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel className="text-slate-700 font-medium text-m">
+                    Ticari Ünvan
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Ticari Ünvan"
+                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-[10px]" />
+                </FormItem>
+              )}
+            />
 
-                  
-
-                  <FormField
-                    control={form.control}
-                    name="firma_sahibi"
-                    render={({ field }) => (
-                    <FormItem className="space-y-1">
-                      <FormLabel className="text-slate-700 font-medium text-m ">
-                      Firma Sahibi
-                      </FormLabel>
-                      <FormControl>
-                      <Input
-                        type="text"
-                        
-                        placeholder="Firma Sahibi"
-                        className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
-                        {...field}
-                      />
-                      </FormControl>
-                      <FormMessage className="text-[10px]" />
-                    </FormItem>
-                    )}
-                  />
-                  <div className="flex items-end">                    <Button
-                    type="submit"
-                    variant="default"
-                    size="sm"
-                    >
-                    ARA
-                    </Button>
-                  </div>
-                  </div>
-                  {/* </div> */}
+            <FormField
+              control={form.control}
+              name="firma_sahibi"
+              render={({ field }) => (
+                <FormItem className="space-y-1">
+                  <FormLabel className="text-slate-700 font-medium text-m ">
+                    Firma Sahibi
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
+                      placeholder="Firma Sahibi"
+                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage className="text-[10px]" />
+                </FormItem>
+              )}
+            />
+            <div className="flex items-end gap-4 ">              <Button
+                            className="bg-blue-600 hover:bg-blue-500 active:bg-blue-400 h-9 w-28 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200 flex items-center justify-center"
+                            type="submit"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              className="mr-1"
+                            >
+                              <circle cx="11" cy="11" r="8"></circle>
+                              <path d="m21 21-4.3-4.3"></path>
+                            </svg>                Ara
+                          </Button>
+            </div>
+          </div>
+          {/* </div> */}
         </form>
-      </Form>      <div className="flex items-center py-2 justify-between">
+      </Form>{" "}
+      <div className="flex items-center py-2 justify-between">
         <Input
           placeholder="Tüm alanlarda arama yapın..."
           value={filtering}
           onChange={(e) => setFiltering(e.target.value)}
           className="max-w-sm h-8"
-        />        <Button
+        />{" "}
+        <Button
           onClick={refreshData}
-          variant="success"
-          size="sm"
+          className="bg-emerald-500 hover:bg-emerald-600 active:bg-cyan-700 h-9 w-28 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200 flex items-center justify-center"
         >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="mr-1"
+          >
+            <path d="M1 4v6h6"></path>
+            <path d="M23 20v-6h-6"></path>
+            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+          </svg>
           Yenile
-        </Button>      </div>
+        </Button>{" "}
+      </div>
       <div>
         <div className="rounded-md border">
           <Table className="w-full">
@@ -364,14 +430,14 @@ export function DataTable({ columns, data, refetch }) {
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <TableHead 
+                    <TableHead
                       key={header.id}
                       style={{
                         width: header.column.columnDef.size,
                         minWidth: header.column.columnDef.minSize,
                         maxWidth: header.column.columnDef.maxSize,
                       }}
-                      className="px-2 py-2 whitespace-nowrap bg-slate-200"
+                      className="px-3 py-3 whitespace-nowrap overflow-hidden text-white bg-cyan-700 text-[0.8rem] font-medium relative"
                     >
                       {header.isPlaceholder
                         ? null
@@ -390,17 +456,20 @@ export function DataTable({ columns, data, refetch }) {
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    
-                    // className={index % 2 === 0 ? "bg-white" : "bg-slate-50"} 
-                    className={`${index % 2 === 0 ? "bg-white" : "bg-slate-50"} cursor-pointer hover:bg-muted`}
-                  onClick={() => {
-                    // BayiEkle sayfasına yönlendir
-                    navigate(`/bayiduzenle/${row.original.id}`); // BayiEkle sayfasına git
-                    console.log("Row clicked:", row.original);
-                  }}
-                >
+                    // className={index % 2 === 0 ? "bg-white" : "bg-slate-50"}
+                    className={
+                        index % 2 === 0
+                          ? "bg-white hover:bg-[#edf7fa] h-12"
+                          : "bg-[#f3fafe] hover:bg-[#e5f5fa] h-12"
+                      }
+                    onClick={() => {
+                      // BayiEkle sayfasına yönlendir
+                      navigate(`/bayiduzenle/${row.original.id}`); // BayiEkle sayfasına git
+                      console.log("Row clicked:", row.original);
+                    }}
+                  >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell 
+                      <TableCell
                         key={cell.id}
                         style={{
                           width: cell.column.columnDef.size,
@@ -409,14 +478,20 @@ export function DataTable({ columns, data, refetch }) {
                         }}
                         className="px-2 py-2"
                       >
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-24 text-center"
+                  >
                     Kayıt bulunamadı.
                   </TableCell>
                 </TableRow>
@@ -429,7 +504,9 @@ export function DataTable({ columns, data, refetch }) {
         <div className="text-sm text-muted-foreground">
           Toplam {table.getFilteredRowModel().rows.length} kayıt
         </div>
-        <div className="flex items-center gap-2">          <Button
+        <div className="flex items-center gap-2">
+          {" "}
+          <Button
             variant="secondary"
             size="sm"
             onClick={() => table.previousPage()}
@@ -440,10 +517,11 @@ export function DataTable({ columns, data, refetch }) {
           </Button>
           <div className="flex items-center gap-1">
             <span className="text-sm font-medium">
-              Sayfa{" "}
-              {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
+              Sayfa {table.getState().pagination.pageIndex + 1} /{" "}
+              {table.getPageCount()}
             </span>
-          </div>          <Button
+          </div>{" "}
+          <Button
             variant="secondary"
             size="sm"
             onClick={() => table.nextPage()}
@@ -455,5 +533,5 @@ export function DataTable({ columns, data, refetch }) {
         </div>
       </div>
     </div>
-  )
+  );
 }

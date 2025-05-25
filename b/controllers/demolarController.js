@@ -40,12 +40,12 @@ export async function getDemoById(req, res) {
 
 //demoduzenleme idye göre put
 export async function updateDemo(req, res) {
-  const { firma_adi, adsoyad, telefon, email, il, aciklama, ip, secilen_tarih } = req.body;
+  const { firma_adi, adsoyad, telefon, email, il, aciklama, ip, secilen_tarih, durum, bayi, notlar } = req.body;
   const { id } = req.params;  try {
     const connection = req.db || (await getConnection());
     const result = await connection.query(
-      'UPDATE demotalep SET "firma_adi" = $1, "adsoyad" = $2, "telefon" = $3,"email" = $4,"il" = $5, "aciklama" = $6,"ip" = $7,"son_gorusme_tarihi" = $8 WHERE id = $9 RETURNING *',
-      [firma_adi, adsoyad, telefon, email, il, aciklama, ip, secilen_tarih, id] 
+      'UPDATE demotalep SET "firma_adi" = $1, "adsoyad" = $2, "telefon" = $3,"email" = $4,"il" = $5, "aciklama" = $6,"ip" = $7,"son_gorusme_tarihi" = $8, "durum" = $9, "bayi" = $10, "notlar" = $11 WHERE id = $12 RETURNING *',
+      [firma_adi, adsoyad, telefon, email, il, aciklama, ip, secilen_tarih,durum,bayi,notlar, id] 
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Güncellenecek demo bulunamadı" });

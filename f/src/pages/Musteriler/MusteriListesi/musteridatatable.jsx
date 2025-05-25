@@ -81,19 +81,21 @@ export default function MusteriDataTable({ columns, data }) {
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
+              table.getRowModel().rows.map((row,index) => (                <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  className=" cursor-pointer hover:bg-muted"
+                  className={
+                        index % 2 === 0
+                          ? "bg-white hover:bg-[#edf7fa] h-12" // Burada h-14 (3.5rem - 56px) yükseklik eklenmiştir
+                          : "bg-[#f3fafe] hover:bg-[#e5f5fa] h-12" // Burada h-14 (3.5rem - 56px) yükseklik eklenmiştir
+                      }
                   onClick={() => {
                     // BayiEkle sayfasına yönlendir
                     navigate(`/musteri/${row.original.id}`); // BayiEkle sayfasına git
                     console.log("Row clicked:", row.original);
                   }}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                >                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id} className="py-3">
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

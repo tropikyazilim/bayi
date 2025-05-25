@@ -484,7 +484,8 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
               }
 
               // Türkçe karakter sorununu önlemek için normalize et
-              let normalizedValue = typeof value === "string" ? value.normalize("NFC") : value;
+              let normalizedValue =
+                typeof value === "string" ? value.normalize("NFC") : value;
               console.log(`API parametresi: ${apiParam} = ${normalizedValue}`);
               queryParams.append(apiParam, normalizedValue);
             }
@@ -553,7 +554,9 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
           console.log(
             "API'dan tüm verileri getiriyorum - Bu normalde olmamalı"
           );
-          const response = await axios.get("http://localhost:3002/api/lisanslar");
+          const response = await axios.get(
+            "http://localhost:3002/api/lisanslar"
+          );
           return response.data;
         }
       } catch (error) {
@@ -740,30 +743,26 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
           onSubmit={form.handleSubmit(onSubmit)}
           className="bg-white p-0 max-h-[calc(100vh-120px)] overflow-y-auto shadow-slate-300"
         >
+          {" "}
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3">
               {error}
             </div>
           )}
-
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-x-4 gap-y-3 pb-2">
+          <div className="grid grid-cols-8 gap-4 p-2 my-1">
             <FormField
               control={form.control}
               name="lisans_arama"
               render={({ field }) => (
-                <FormItem className="space-y-1 ">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Lisans Kodu
-                  </FormLabel>
+                <FormItem>
+                  <FormLabel>Lisans Kodu</FormLabel>
                   <FormControl>
                     <Input
-                      type="text"
+                      className="border-slate-400"
                       placeholder="Lisans kodu ile ara"
-                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
             />
@@ -772,19 +771,15 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
               control={form.control}
               name="musteri_arama"
               render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Müşteri Ünvanı
-                  </FormLabel>
+                <FormItem>
+                  <FormLabel>Müşteri Ünvanı</FormLabel>
                   <FormControl>
                     <Input
-                      type="text"
+                      className="border-slate-400 text-slate-600 italic"
                       placeholder="Müşteri ünvanı ile ara"
-                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
             />
@@ -793,47 +788,40 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
               control={form.control}
               name="bayi_arama"
               render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m ">
-                    Bayi Ünvanı
-                  </FormLabel>
+                <FormItem>
+                  <FormLabel>Bayi Ünvanı</FormLabel>
                   <FormControl>
                     <Input
-                      type="text"
+                      className="border-slate-400 italic text-md"
                       placeholder="Bayi ünvanı ile ara"
-                      className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="paket_arama"
               render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Paket
-                  </FormLabel>{" "}
+                <FormItem>
+                  <FormLabel>Paket</FormLabel>
                   <FormControl>
                     <Select
-                      className="w-[180px] max-h-60 overflow-auto"
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
                       value={field.value}
                       {...field}
                     >
-                      <SelectTrigger className="bg-white   h-8 text-m shadow-sm shadow-purple-200">
+                      <SelectTrigger className="border-slate-400 h-9 text-slate-400 italic">
                         <SelectValue placeholder="Paket seçin veya arayın" />
-                      </SelectTrigger>{" "}
+                      </SelectTrigger>
                       <SelectContent>
                         {paketlerYukleniyor ? (
                           <SelectItem value="loading" disabled>
                             Yükleniyor...
                           </SelectItem>
-                        ) : paketler && paketler.length > 0 ? (
+                        ) : paketler?.length > 0 ? (
                           paketler.map((paket) => (
                             <SelectItem
                               key={paket.id}
@@ -850,7 +838,6 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
             />
@@ -859,19 +846,15 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
               control={form.control}
               name="yetkili_arama"
               render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Yetkili
-                  </FormLabel>{" "}
+                <FormItem>
+                  <FormLabel>Yetkili</FormLabel>
                   <FormControl>
                     <Select
-                      className="w-[180px] max-h-60 overflow-auto"
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
                       value={field.value}
                       {...field}
                     >
-                      <SelectTrigger className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200">
+                      <SelectTrigger className="border-slate-400 h-9 text-slate-400 italic">
                         <SelectValue placeholder="Yetkili ile ara" />
                       </SelectTrigger>
                       <SelectContent>
@@ -881,7 +864,6 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
             />
@@ -890,32 +872,31 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
               control={form.control}
               name="il"
               render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    İl
-                  </FormLabel>
+                <FormItem>
+                  <FormLabel>İl</FormLabel>
                   <FormControl>
                     <Popover open={openIller} onOpenChange={setOpenIller}>
+                      {" "}
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
                           role="combobox"
                           aria-expanded={openIller}
-                          className="w-full justify-between bg-white border-slate-300 h-8 text-sm shadow-sm shadow-blue-200"
-                          {...field}
+                          className="w-full justify-between h-9 text-left border-slate-400 rounded-md shadow-none text-slate-400 italic font-normal"
                         >
                           {field.value
                             ? iller.find((il) => il.value === field.value)
                                 ?.label
                             : "İl ile ara"}
-                          <ChevronsUpDown className="ml-2 h-3 w-3 shrink-0 opacity-50" />
+
+                          <ChevronsUpDown className="ml-2 h-3 w-3 opacity-50" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-[200px] p-0">
+                      <PopoverContent className="p-0">
                         <Command>
                           <CommandInput placeholder="İl ara..." />
                           <CommandEmpty>İl bulunamadı.</CommandEmpty>
-                          <CommandList className="max-h-64 overflow-auto">
+                          <CommandList>
                             {iller.map((il) => (
                               <CommandItem
                                 key={il.value}
@@ -941,7 +922,6 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
                       </PopoverContent>
                     </Popover>
                   </FormControl>
-                  <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
             />
@@ -950,19 +930,15 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
               control={form.control}
               name="aktiflik_durumu_arama"
               render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Aktiflik Durumu
-                  </FormLabel>{" "}
+                <FormItem>
+                  <FormLabel>Aktiflik Durumu</FormLabel>
                   <FormControl>
                     <Select
-                      className="w-[180px] max-h-60 overflow-auto"
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
                       value={field.value}
                       {...field}
                     >
-                      <SelectTrigger className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200">
+                      <SelectTrigger className="border-slate-400 h-9 text-slate-400 italic">
                         <SelectValue placeholder="Aktiflik durumu ile ara" />
                       </SelectTrigger>
                       <SelectContent>
@@ -971,28 +947,26 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="lisans_tipi_arama"
               render={({ field }) => (
-                <FormItem className="space-y-1">
-                  <FormLabel className="text-slate-700 font-medium text-m">
-                    Lisans Tipi
-                  </FormLabel>{" "}
+                <FormItem>
+                  <FormLabel>Lisans Tipi</FormLabel>
                   <FormControl>
                     <Select
-                      className="w-[180px] max-h-60 overflow-auto"
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
                       value={field.value}
                       {...field}
                     >
-                      <SelectTrigger className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200">
-                        <SelectValue placeholder="Lisans tipi seçin" />
+                      <SelectTrigger className="border-slate-400 h-9 text-slate-400 italic">
+                        <SelectValue 
+                        
+                        placeholder="Lisans tipi seçin" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="demo">Demo</SelectItem>
@@ -1000,15 +974,13 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
                       </SelectContent>
                     </Select>
                   </FormControl>
-                  <FormMessage className="text-[10px]" />
                 </FormItem>
               )}
             />
 
-            <div className="flex items-end gap-4">
-              {" "}              <Button
+            <div className="flex items-end gap-4 ">              <Button
+                className="bg-blue-600 hover:bg-blue-500 active:bg-blue-400 h-9 w-28 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200 flex items-center justify-center"
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-400 text-white h-8 text-sm px-3 py-0 pl-2 pr-6 font-medium active:bg-blue-300 transition-colors flex items-center"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -1024,55 +996,61 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
                 >
                   <circle cx="11" cy="11" r="8"></circle>
                   <path d="m21 21-4.3-4.3"></path>
-                </svg>
-                ARA
+                </svg>                Ara
               </Button>
               <Button
                 type="button"
+                className="bg-orange-400 hover:bg-orange-300 active:bg-orange-200 h-9 w-28 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200"
                 onClick={() => {
-                  // Form'u sıfırla
                   form.reset({
                     lisans_arama: "",
                     musteri_arama: "",
                     bayi_arama: "",
                     paket_arama: "",
-                    il: "", // İl alanı devre dışı olsa da formu sıfla
+                    il: "",
                     aktiflik_durumu_arama: "",
                     lisans_tipi_arama: "",
                     yetkili_arama: "",
                   });
-
-                  // Filtreleri temizle
                   setFilterParams({});
-
-                  // Filtreleme sıfırlandı bilgisi
                   toast.info("Filtreler temizlendi", {
                     description: "Tüm arama kriterleri temizlendi.",
                   });
-                  // Tablo verilerini yenile
                   if (data) {
-                    // Bu geçerli sorguya veriyi kaydeder
                     queryClient.setQueryData(["filteredLisanslar", {}], data);
-                    console.log(
-                      "Tablo verileri sıfırlandı, tüm kayıtlar gösteriliyor"
-                    );
                   }
-
-                  // Eğer veri yoksa, ana kaynaktan yenileyebiliriz
                   if (!data) {
                     refreshData();
                   }
                 }}
-                className="bg-red-400 hover:bg-red-300 text-white h-8 text-sm px-3 py-0 pl-4 pr-4 font-medium active:bg-red-200 transition-colors"
               >
-                TEMİZLE
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mr-1"
+                >
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+                Temizle
               </Button>
             </div>
           </div>
           {/* </div> */}
         </form>
       </Form>{" "}
-      <div className="flex items-center justify-between py-2 mb-2">
+      
+      <div className="flex items-center justify-between py-2 mb-0">
         <div className="flex w-full justify-between gap-5">
           <Input
             placeholder="Tüm alanlarda arama yapın..."
@@ -1096,11 +1074,26 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
                 <path d="m21 21-4.3-4.3"></path>
               </svg>
             }
-          />
-          <Button
-            className="bg-emerald-500 hover:bg-emerald-600 active:bg-cyan-700 h-8 w-20 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200"
+          />          <Button
+            className="bg-emerald-500 hover:bg-emerald-600 active:bg-cyan-700 h-9 w-28 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200 flex items-center justify-center"
             onClick={() => refreshData()}
           >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="mr-1"
+            >
+              <path d="M1 4v6h6"></path>
+              <path d="M23 20v-6h-6"></path>
+              <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+            </svg>
             Yenile
           </Button>
         </div>
@@ -1129,7 +1122,7 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
                           minWidth: header.column.columnDef.minSize,
                           maxWidth: header.column.columnDef.maxSize,
                         }}
-                        className="px-3 py-2 whitespace-nowrap overflow-hidden text-white bg-cyan-700 text-[0.8rem] font-medium relative"
+                        className="px-3 py-3 whitespace-nowrap overflow-hidden text-white bg-cyan-700 text-[0.8rem] font-medium relative"
                       >
                         {header.isPlaceholder
                           ? null
@@ -1144,14 +1137,13 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
               </TableHeader>
               <TableBody>
                 {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row, index) => (
-                    <TableRow
+                  table.getRowModel().rows.map((row, index) => (                    <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
                       className={
                         index % 2 === 0
-                          ? "bg-white hover:bg-[#e1f0f5]"
-                          : "bg-[#eaf5fa] hover:bg-[#d0e8f0]"
+                          ? "bg-white hover:bg-[#edf7fa]"
+                          : "bg-[#f3fafe] hover:bg-[#e5f5fa]"
                       }
                     >
                       {row.getVisibleCells().map((cell) => (
@@ -1162,7 +1154,7 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
                             minWidth: cell.column.columnDef.minSize,
                             maxWidth: cell.column.columnDef.maxSize,
                             overflow: "hidden",
-                            textOverflow: "ellipsis"
+                            textOverflow: "ellipsis",
                           }}
                           className="px-3 py-2 text-[0.8rem] font-normal"
                         >
@@ -1242,7 +1234,8 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
           </Button>
           <div className="flex items-center gap-1 bg-[#eef6fa] px-4 py-1.5 rounded-md">
             <span className="text-sm font-medium text-[#5F99AE]">
-              Sayfa {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
+              Sayfa {table.getState().pagination.pageIndex + 1} /{" "}
+              {table.getPageCount()}
             </span>
           </div>
           <Button

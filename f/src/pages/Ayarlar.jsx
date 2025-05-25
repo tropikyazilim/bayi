@@ -237,9 +237,7 @@ export default function Ayarlar() {
                 <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
                   {error}
                 </div>
-              )}
-
-              <Tabs defaultValue="account" className="w-[800px]">
+              )}              <Tabs defaultValue="moduller" className="w-[800px]">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="moduller">Modüller</TabsTrigger>
                   <TabsTrigger value="lisanslar">Lisanslar</TabsTrigger>

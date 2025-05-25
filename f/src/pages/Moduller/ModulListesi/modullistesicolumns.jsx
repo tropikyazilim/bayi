@@ -20,6 +20,7 @@ export const modullistesicolumns = [
     header: "Modül Açıklaması",
     size: 600,
     minSize: 600
-  }
+  },
+  
 ];
   
