@@ -19,7 +19,22 @@ export async function getAllDemolar(req, res) {
   try {
     const connection = req.db || (await getConnection());
     const result = await connection.query("SELECT * FROM demotalep ORDER BY id desc");
-    res.status(200).json(result.rows);
+      // Tarihleri Türkiye formatına çevir
+    const localizedData = result.rows.map(row => ({
+      ...row,
+      created_at: row.created_at ? new Date(row.created_at).toLocaleString('tr-TR', {
+        timeZone: 'Europe/Istanbul'
+      }) : null,
+      updated_at: row.updated_at ? new Date(row.updated_at).toLocaleString('tr-TR', {
+        timeZone: 'Europe/Istanbul'
+      }) : null,
+      son_gorusme_tarihi: row.son_gorusme_tarihi ? new Date(row.son_gorusme_tarihi).toLocaleString('tr-TR', {
+        timeZone: 'Europe/Istanbul',
+        dateStyle: 'short' // Sadece tarih formatını göster, saati gösterme
+      }) : null
+    }));
+
+    res.status(200).json(localizedData);
   } catch (error) {
     res.status(500).json({ message: "Demo bilgileri alınamadı: " + error.message });
   }
@@ -32,7 +47,23 @@ export async function getDemoById(req, res) {
     if (result.rows.length === 0) {
       return res.status(404).json({ message: "Demo bulunamadı" });
     }
-    res.status(200).json(result.rows[0]);
+    
+    // Tarihleri Türkiye saatine çevir
+    const localizedData = {
+      ...result.rows[0],
+      created_at: result.rows[0].created_at ? new Date(result.rows[0].created_at).toLocaleString('tr-TR', {
+        timeZone: 'Europe/Istanbul'
+      }) : null,
+      updated_at: result.rows[0].updated_at ? new Date(result.rows[0].updated_at).toLocaleString('tr-TR', {
+        timeZone: 'Europe/Istanbul'
+      }) : null,
+      son_gorusme_tarihi: result.rows[0].son_gorusme_tarihi ? new Date(result.rows[0].son_gorusme_tarihi).toLocaleString('tr-TR', {
+        timeZone: 'Europe/Istanbul',
+        dateStyle: 'short'
+      }) : null
+    };
+
+    res.status(200).json(localizedData);
   } catch (error) {
     res.status(500).json({ message: "Demo alınamadı: " + error.message });
   }
