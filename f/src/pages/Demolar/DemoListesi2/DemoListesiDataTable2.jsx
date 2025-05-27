@@ -10,6 +10,12 @@ import autoTable from "jspdf-autotable"; // PDF'de tablo oluşturmak için
 import { DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner"; // Toast bildirimleri için
 import {
+  SortableContext,
+  horizontalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
+import { DndContext } from "@dnd-kit/core";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -56,6 +62,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useQuery, useQueryClient } from "@tanstack/react-query"; // React Query eklendi
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3002";
 
@@ -131,6 +139,26 @@ export function StatusCell({ row, value, table }) {
           <div className="h-3 w-3 animate-spin rounded-full border-2 border-b-transparent border-t-current"></div>
         </div>
       )}
+    </div>
+  );
+}
+
+// DraggableColumnHeader bileşeni
+function DraggableColumnHeader({ header }) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: header.id,
+    });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    cursor: "grab",
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      {header.column.columnDef.header}
     </div>
   );
 }
@@ -788,7 +816,18 @@ export default function DemoListesiDataTable({
     }
   }, [parametersData]);
   // Sütun sıralaması için state
-  const [columnOrder, setColumnOrder] = useState([]);
+  const [columnOrder, setColumnOrder] = useState(columns.map((col) => col.id));
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = columnOrder.indexOf(active.id);
+      const newIndex = columnOrder.indexOf(over.id);
+      const newColumnOrder = arrayMove(columnOrder, oldIndex, newIndex);
+      setColumnOrder(newColumnOrder);
+    }
+  };
+
   const table = useReactTable({
     data,
     columns,
@@ -810,7 +849,6 @@ export default function DemoListesiDataTable({
     enableColumnFilters: true,
     onColumnFiltersChange: setColumnFilters,
     enableColumnResizing: true,
-    
     columnResizeMode,
     onColumnSizingChange: setColumnSizing,
     onSortingChange: setSorting, // Sıralama durumu değiştiğinde bunu state'e kaydet    onColumnOrderChange: setColumnOrder, // Sütun sıralaması değiştiğinde bunu state'e kaydet
@@ -1387,8 +1425,11 @@ export default function DemoListesiDataTable({
                                   strokeLinejoin="round"
                                   className="h-4 w-4"
                                 >
-                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7z" />
+                                  <path d="M14 2v6h6" />
+                                  <path d="M16 13H8" />
+                                  <path d="M16 17H8" />
+                                  <path d="M10 9H8" />
                                 </svg>
                                 <span className="sr-only">Düzenle</span>
                               </Button>{" "}

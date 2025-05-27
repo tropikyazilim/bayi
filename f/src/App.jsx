@@ -24,6 +24,7 @@ import LisansDuzenle from "./pages/Lisanslar/LisansDuzenle";
 import DemoEkle from "./pages/Demolar/DemoEkle/DemoEkle";
 import DemoListesi from "./pages/Demolar/DemoListesi/DemoListesi";
 import DemoDuzenle from "./pages/Demolar/DemoDuzenle";
+import DemoListesi3 from "./pages/Demolar/DemoListesi3/DemoListesi3";
 
 const router = createBrowserRouter([
   {
@@ -58,12 +59,16 @@ const router = createBrowserRouter([
       { path: "demoduzenle/:id", element: <DemoDuzenle /> },
 
       { path: "ayarlar", element: <Ayarlar /> },
+      { path: "demolistesi3", element: <DemoListesi3 />},
     ],
   },
 ]);
 
 const queryClient = new QueryClient();
-function App() {  return (
+function App() {
+  
+  
+  return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
     </QueryClientProvider>

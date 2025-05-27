@@ -8,6 +8,7 @@ import { ClerkProvider } from '@clerk/clerk-react'
 import { neobrutalism, dark } from '@clerk/themes'
 import { trTR } from '@clerk/localizations'
 
+
 const clerk_key = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 if (!clerk_key) {
   throw new Error('VITE_CLERK_PUBLISHABLE_KEY is not defined')
