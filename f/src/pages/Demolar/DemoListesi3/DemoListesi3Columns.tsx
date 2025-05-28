@@ -67,12 +67,7 @@ export const columns: MRT_ColumnDef<Person>[] = [
           accessorKey: "notlar",
           header: "Notlar",
           size: 145,
-          
+          grow: 20,
         },
-        {
-          id: "actions",
-          header: "İşlemler",
-          size: 145,
-   
-        },
+      
       ];

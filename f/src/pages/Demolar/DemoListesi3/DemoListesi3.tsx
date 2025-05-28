@@ -55,7 +55,7 @@ export default function DemoListesi3() {
       // Ağ bağlantısı geri geldiğinde otomatik yeniden çekmeyi devre dışı bırak
       refetchOnReconnect: false,
       // Stale time'ı arttır - 5 dakika içinde tekrar çekilmesin
-      staleTime: 5 * 60 * 1000,
+      // staleTime: 5 * 60 * 1000,
     });
   
     if (isLoading) {
