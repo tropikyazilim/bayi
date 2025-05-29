@@ -93,7 +93,7 @@ export async function getVarsayilanAyar(req, res) {
           "durum": 120,
           "bayi": 130,
           "notlar": 100,
-          "actions": 80
+          
         },
         columnVisibility: {}, // Tüm sütunlar görünür
         columnFilters: [],  // Filtre uygulanmamış
@@ -109,7 +109,7 @@ export async function getVarsayilanAyar(req, res) {
           "durum",
           "bayi",
           "notlar",
-          "actions"
+          
         ]
       };
       

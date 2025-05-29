@@ -77,6 +77,12 @@ export default function DemoListesi3DataTable({
   const [lastUpdateTime, setLastUpdateTime] = useState<string | null>(null);
   const [isManualPageChange, setIsManualPageChange] = useState(false);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
+  const [paginationKey, setPaginationKey] = useState(0);
+  const [isResizingOrJustResized, setIsResizingOrJustResized] = useState(false);
+  const resizeTimeoutRef = React.useRef(null);
+  const [columnResizeMode, setColumnResizeMode] = useState("onChange");
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [selectedDemoId, setSelectedDemoId] = useState(null);
 
   const updateTableConfig = (updates: Partial<TableDesign>) => {
     setTableConfig(prev => ({
@@ -85,248 +91,7 @@ export default function DemoListesi3DataTable({
     }));
   };
 
-  // Parametreleri getirmek için useQuery kullanımı
-  const {
-    data: parametersData,
-    isLoading,
-    error: queryError,
-  } = useQuery({
-    queryKey: ["parametreler"],
-    queryFn: async () => {
-      try {
-        const response = await axios.get("http://localhost:3002/api/ayarlar");
-        return response.data || [];
-      } catch (error) {
-        console.error("API Hatası:", error);
-        throw error;
-      }
-    },
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
-
-  // Add useEffect to log data when component mounts or data changes
-  useEffect(() => {
-    console.log("Demo Listesi Data:", data);
-  }, [data]);
-
-  // State to force re-render when needed
-  const [paginationKey, setPaginationKey] = useState(0);  // Track if a resize operation was recently performed
-  const [isResizingOrJustResized, setIsResizingOrJustResized] = useState(false);
-  const resizeTimeoutRef = React.useRef(null);
-  // ColumnResizeMode tipi yerine doğrudan string değeri kullanıyoruz
-  const [columnResizeMode, setColumnResizeMode] = useState("onChange"); // Changed back to onChange for live resizing preview
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [selectedDemoId, setSelectedDemoId] = useState(null);
-
-  // Load saved configuration when parameters data is available
-  useEffect(() => {
-    if (parametersData && parametersData.length > 0) {
-      const tasarimParametre = parametersData.find(
-        (param: TableParameter) => param.parametreid === 4
-      );      if (tasarimParametre?.deger) {
-        try {
-          const tasarimVerisi: TableDesign = typeof tasarimParametre.deger === "string" 
-            ? JSON.parse(tasarimParametre.deger) 
-            : tasarimParametre.deger;
-
-          console.log("Loading saved table design:", tasarimVerisi);
-
-          // Update the table configuration with the saved design
-          setTableConfig({
-            columnOrder: tasarimVerisi.columnOrder || [],
-            columnFilters: tasarimVerisi.columnFilters || [],
-            columnSizing: tasarimVerisi.columnSizing || {},
-            columnVisibility: tasarimVerisi.columnVisibility || {},
-            sorting: tasarimVerisi.sorting || []
-          });
-
-          if (tasarimParametre.kayitzamani) {
-            setLastUpdateTime(tasarimParametre.kayitzamani);
-            console.log("Last update time loaded:", tasarimParametre.kayitzamani);
-          }
-        } catch (error) {
-          console.error("Tablo tasarımı yüklenirken hata:", error);
-          toast.error("Tablo tasarımı yüklenirken hata oluştu");
-        }
-      }
-    }
-  }, [parametersData]);
-  //tasarımı kaydetmek için backende put isteği atılacak
-  const updateParametersMutation = useMutation<any, Error, TableParameter[]>({
-    mutationFn: async (parameterData) => {
-      console.log("Mutation çağrıldı, gönderilen veri:", parameterData);
-      return axios.put(`${API_URL}/api/ayarlar`, parameterData, {
-        headers: { "Content-Type": "application/json" },
-      });
-    },
-    onSuccess: (response) => {
-      setSuccess(true);
-      setError(null);
-
-      queryClient.invalidateQueries({ queryKey: ["parametreler"] });
-
-      if (response.data?.updatedAyarlar?.length > 0) {
-        const updatedParam = response.data.updatedAyarlar.find(
-          (param: TableParameter) => param.parametreid === 4
-        );
-        if (updatedParam?.kayitzamani) {
-          setLastUpdateTime(updatedParam.kayitzamani);
-        }
-      }
-
-      toast.success("Tüm değerler başarıyla güncellendi", {
-        description: "İşlem başarıyla tamamlandı",
-        style: {
-          backgroundColor: "#dcfce7",
-          border: "1px solid #86efac",
-          color: "#166534",
-        },
-      });
-    },
-    onError: (error: Error & { response?: any }) => {
-      console.error("Mutation hatası:", error);
-      console.error("Hata detayları:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-      });
-
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        error.message ||
-        "Değerler güncellenirken bir hata oluştu";
-
-      setError(errorMessage);
-      setSuccess(false);
-
-      toast.error("Hata", {
-        description: errorMessage,
-        style: {
-          backgroundColor: "#fee2e2",
-          border: "1px solid #fca5a5",
-          color: "#991b1b",
-        },
-      });
-    },
-  });
-
-  // Clean up the timeout when the component unmounts
-  React.useEffect(() => {
-    return () => {
-      if (resizeTimeoutRef.current) {
-        clearTimeout(resizeTimeoutRef.current);
-      }
-    };
-  }, []);
-  // We'll move the column visibility effect after table initialization
-
-  // Effect to handle data changes and maintain pagination state
-  React.useEffect(() => {
-    // If this is not a manual page change and data has changed,
-    // make sure we preserve the current page if possible
-    if (!isManualPageChange && data) {
-      const totalPages = Math.ceil(data.length / 10);
-      // Make sure the current page index is still valid with the new data
-      if (currentPageIndex >= totalPages) {
-        setCurrentPageIndex(Math.max(0, totalPages - 1));
-      }
-      // Reset the flag
-      setIsManualPageChange(false);
-    }
-  }, [data, currentPageIndex, isManualPageChange]);
-  async function handleVarsayilanTasarim() {
-    toast.info("Varsayılan tasarım yükleniyor...");
-
-    try {
-      const response = await axios.get(`${API_URL}/api/ayarlar/varsayilan/4`);
-      const tasarimVerisi: TableDesign = response.data?.deger 
-        ? (typeof response.data.deger === "string" 
-          ? JSON.parse(response.data.deger) 
-          : response.data.deger)
-        : response.data;
-
-      if (tasarimVerisi) {
-        console.log("Varsayılan tasarım uygulanıyor:", tasarimVerisi);
-
-        if (tasarimVerisi.columnSizing) {
-          table.setColumnSizing(tasarimVerisi.columnSizing);
-        }
-
-        if (tasarimVerisi.columnFilters) {
-          table.setColumnFilters(tasarimVerisi.columnFilters);
-        }
-
-        if (tasarimVerisi.columnVisibility) {
-          table.setColumnVisibility(tasarimVerisi.columnVisibility);
-        }
-
-        if (tasarimVerisi.sorting) {
-          table.setSorting(tasarimVerisi.sorting);
-        }
-
-        if (tasarimVerisi.columnOrder) {
-          table.setColumnOrder(tasarimVerisi.columnOrder);
-        }
-
-        if (response.data.kayitzamani) {
-          setLastUpdateTime(response.data.kayitzamani);
-        }
-
-        toast.success("Varsayılan tablo tasarımı yüklendi");
-      } else {
-        toast.info("Varsayılan tasarım bulunamadı");
-      }
-    } catch (error) {
-      console.error("Varsayılan tasarım getirme hatası:", error);
-      toast.error(
-        "Varsayılan tasarım yüklenirken hata oluştu: " +
-        ((error as any).response?.data?.message || (error as Error).message)
-      );
-    }
-  }
-
-  function handleTasarimiKaydet() {
-    console.log('Saving table design:', tableConfig);
-
-    const parameterData: TableParameter[] = [{
-      parametreid: 4,
-      deger: tableConfig,
-    }];
-
-    updateParametersMutation.mutate(parameterData);
-    toast.info("Tablo tasarımı kaydediliyor...");
-
-    if (lastUpdateTime) {
-      toast.info(`Son kayıt: ${formatDateTime(lastUpdateTime)}`, {
-        duration: 3000,
-        style: {
-          backgroundColor: "#e0f2fe",
-          border: "1px solid #93c5fd",
-          color: "#1e40af",
-        },
-      });
-    }
-  }
-
-  // We'll move the column visibility effect after table initialization
-
-  // Effect to handle data changes and maintain pagination state
-  React.useEffect(() => {
-    // If this is not a manual page change and data has changed,
-    // make sure we preserve the current page if possible
-    if (!isManualPageChange && data) {
-      const totalPages = Math.ceil(data.length / 10);
-      // Make sure the current page index is still valid with the new data
-      if (currentPageIndex >= totalPages) {
-        setCurrentPageIndex(Math.max(0, totalPages - 1));
-      }
-      // Reset the flag
-      setIsManualPageChange(false);
-    }
-  }, [data, currentPageIndex, isManualPageChange]);
-
+  // Table instance definition - MUST be before any useEffects that use it
   const table = useMaterialReactTable({
     columns,
     data,
@@ -435,6 +200,168 @@ export default function DemoListesi3DataTable({
         </Tooltip>
       </Box>
     ),
+  });
+
+  // Parametreleri getirmek için useQuery kullanımı
+  const {
+    data: parametersData,
+    isLoading,
+    error: queryError,
+  } = useQuery({
+    queryKey: ["parametreler"],
+    queryFn: async () => {
+      try {
+        const response = await axios.get("http://localhost:3002/api/ayarlar");
+        return response.data || [];
+      } catch (error) {
+        console.error("API Hatası:", error);
+        throw error;
+      }
+    },
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+  });
+
+  // Load saved configuration when parameters data is available
+  useEffect(() => {
+    if (!table || !parametersData || !parametersData.length) return;
+
+    const tasarimParametre = parametersData.find(
+      (param: TableParameter) => param.parametreid === 4
+    );
+
+    if (tasarimParametre?.deger) {
+      try {
+        const tasarimVerisi: TableDesign = typeof tasarimParametre.deger === "string" 
+          ? JSON.parse(tasarimParametre.deger) 
+          : tasarimParametre.deger;
+
+        console.log("Loading saved table design:", tasarimVerisi);
+
+        // Update table states using table instance methods
+        if (tasarimVerisi.columnSizing) {
+          table.setColumnSizing(tasarimVerisi.columnSizing);
+        }
+
+        if (tasarimVerisi.columnFilters) {
+          table.setColumnFilters(tasarimVerisi.columnFilters);
+        }
+
+        if (tasarimVerisi.columnVisibility) {
+          table.setColumnVisibility(tasarimVerisi.columnVisibility); 
+        }
+
+        if (tasarimVerisi.sorting) {
+          table.setSorting(tasarimVerisi.sorting);
+        }
+
+        if (tasarimVerisi.columnOrder) {
+          table.setColumnOrder(tasarimVerisi.columnOrder);
+        }
+
+        // Update table config state
+        setTableConfig({
+          columnOrder: tasarimVerisi.columnOrder || [],
+          columnFilters: tasarimVerisi.columnFilters || [],
+          columnSizing: tasarimVerisi.columnSizing || {},
+          columnVisibility: tasarimVerisi.columnVisibility || {},
+          sorting: tasarimVerisi.sorting || []
+        });
+
+        if (tasarimParametre.kayitzamani) {
+          setLastUpdateTime(tasarimParametre.kayitzamani);
+          console.log("Last update time loaded:", tasarimParametre.kayitzamani);
+        }
+      } catch (error) {
+        console.error("Tablo tasarımı yüklenirken hata:", error);
+        toast.error("Tablo tasarımı yüklenirken hata oluştu");
+      }
+    }
+  }, [parametersData, table]);
+
+  // Effect to handle data changes and maintain pagination state
+  useEffect(() => {
+    if (!isManualPageChange && data) {
+      const totalPages = Math.ceil(data.length / 10);
+      if (currentPageIndex >= totalPages) {
+        setCurrentPageIndex(Math.max(0, totalPages - 1));
+      }
+      setIsManualPageChange(false);
+    }
+  }, [data, currentPageIndex, isManualPageChange]);
+
+  // Clean up the timeout when the component unmounts
+  useEffect(() => {
+    return () => {
+      if (resizeTimeoutRef.current) {
+        clearTimeout(resizeTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Add useEffect to log data when component mounts or data changes
+  useEffect(() => {
+    console.log("Demo Listesi Data:", data);
+  }, [data]);
+
+  //tasarımı kaydetmek için backende put isteği atılacak
+  const updateParametersMutation = useMutation<any, Error, TableParameter[]>({
+    mutationFn: async (parameterData) => {
+      console.log("Mutation çağrıldı, gönderilen veri:", parameterData);
+      return axios.put(`${API_URL}/api/ayarlar`, parameterData, {
+        headers: { "Content-Type": "application/json" },
+      });
+    },
+    onSuccess: (response) => {
+      setSuccess(true);
+      setError(null);
+
+      queryClient.invalidateQueries({ queryKey: ["parametreler"] });
+
+      if (response.data?.updatedAyarlar?.length > 0) {
+        const updatedParam = response.data.updatedAyarlar.find(
+          (param: TableParameter) => param.parametreid === 4
+        );
+        if (updatedParam?.kayitzamani) {
+          setLastUpdateTime(updatedParam.kayitzamani);
+        }
+      }
+
+      toast.success("Tüm değerler başarıyla güncellendi", {
+        description: "İşlem başarıyla tamamlandı",
+        style: {
+          backgroundColor: "#dcfce7",
+          border: "1px solid #86efac",
+          color: "#166534",
+        },
+      });
+    },
+    onError: (error: Error & { response?: any }) => {
+      console.error("Mutation hatası:", error);
+      console.error("Hata detayları:", {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+      });
+
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Değerler güncellenirken bir hata oluştu";
+
+      setError(errorMessage);
+      setSuccess(false);
+
+      toast.error("Hata", {
+        description: errorMessage,
+        style: {
+          backgroundColor: "#fee2e2",
+          border: "1px solid #fca5a5",
+          color: "#991b1b",
+        },
+      });
+    },
   });
 
   const exportToPdf = () => {
@@ -603,6 +530,80 @@ export default function DemoListesi3DataTable({
       minute: "2-digit",
       second: "2-digit",
     }).format(date);
+  }
+
+  async function handleVarsayilanTasarim() {
+    toast.info("Varsayılan tasarım yükleniyor...");
+
+    try {
+      const response = await axios.get(`${API_URL}/api/ayarlar/varsayilan/4`);
+      const tasarimVerisi: TableDesign = response.data?.deger 
+        ? (typeof response.data.deger === "string" 
+          ? JSON.parse(response.data.deger) 
+          : response.data.deger)
+        : response.data;
+
+      if (tasarimVerisi) {
+        console.log("Varsayılan tasarım uygulanıyor:", tasarimVerisi);
+
+        if (tasarimVerisi.columnSizing) {
+          table.setColumnSizing(tasarimVerisi.columnSizing);
+        }
+
+        if (tasarimVerisi.columnFilters) {
+          table.setColumnFilters(tasarimVerisi.columnFilters);
+        }
+
+        if (tasarimVerisi.columnVisibility) {
+          table.setColumnVisibility(tasarimVerisi.columnVisibility);
+        }
+
+        if (tasarimVerisi.sorting) {
+          table.setSorting(tasarimVerisi.sorting);
+        }
+
+        if (tasarimVerisi.columnOrder) {
+          table.setColumnOrder(tasarimVerisi.columnOrder);
+        }
+
+        if (response.data.kayitzamani) {
+          setLastUpdateTime(response.data.kayitzamani);
+        }
+
+        toast.success("Varsayılan tablo tasarımı yüklendi");
+      } else {
+        toast.info("Varsayılan tasarım bulunamadı");
+      }
+    } catch (error) {
+      console.error("Varsayılan tasarım getirme hatası:", error);
+      toast.error(
+        "Varsayılan tasarım yüklenirken hata oluştu: " +
+        ((error as any).response?.data?.message || (error as Error).message)
+      );
+    }
+  }
+
+  function handleTasarimiKaydet() {
+    console.log('Saving table design:', tableConfig);
+
+    const parameterData: TableParameter[] = [{
+      parametreid: 4,
+      deger: tableConfig,
+    }];
+
+    updateParametersMutation.mutate(parameterData);
+    toast.info("Tablo tasarımı kaydediliyor...");
+
+    if (lastUpdateTime) {
+      toast.info(`Son kayıt: ${formatDateTime(lastUpdateTime)}`, {
+        duration: 3000,
+        style: {
+          backgroundColor: "#e0f2fe",
+          border: "1px solid #93c5fd",
+          color: "#1e40af",
+        },
+      });
+    }
   }
 
   return (
