@@ -1,6 +1,6 @@
 "use client";
 import { MRT_ColumnDef } from "material-react-table";
-import { type Person } from "./DemoListesi3";
+import { type Person } from "./DemoListesi";
 
 
 

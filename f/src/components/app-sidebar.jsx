@@ -148,10 +148,6 @@ export function AppSidebar({ onSignOut, ...props }) {
             title: "Demo Listesi",
             url: "demolistesi",
           },
-          {
-            title: "Demo Listesi 3",
-            url: "demolistesi3",
-          },
         ],
       },
  

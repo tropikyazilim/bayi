@@ -6,18 +6,35 @@ import { jsPDF } from "jspdf"; // PDF export işlemleri için
 import autoTable from "jspdf-autotable"; // PDF'de tablo oluşturmak için
 import { useState, useEffect } from "react";
 import { useMutation } from "@tanstack/react-query";
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Email as EmailIcon,
+} from '@mui/icons-material';
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query"; // React Query eklendi
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
   MaterialReactTable,
   useMaterialReactTable,
-  type MRT_ColumnDef,
+  MRT_ColumnDef,
 } from "material-react-table";
-import { type Person } from "./DemoListesi3";
+import { Person } from "./DemoListesi";
 import { MRT_Localization_TR } from "material-react-table/locales/tr";
 import { Box, Button, IconButton, Tooltip } from "@mui/material";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { Button as Buttonshad } from "@/components/ui/button";
+import {
+  
+  MRT_ActionMenuItem,
+  
+} from 'material-react-table';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,17 +68,17 @@ interface TableDesign {
   columnOrder: string[];
 }
 
-interface DemoListesi3DataTableProps {
+interface DemoListesiDataTableProps {
   columns: MRT_ColumnDef<Person>[];
   data: Person[];
   refetch?: () => void;
 }
 
-export default function DemoListesi3DataTable({
+export default function DemoListesiDataTable({
   columns,
   data,
   refetch,
-}: DemoListesi3DataTableProps) {
+}: DemoListesiDataTableProps) {
   const { id } = useParams();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +89,7 @@ export default function DemoListesi3DataTable({
     columnFilters: [],
     columnSizing: {},
     columnVisibility: {},
-    sorting: []
+    sorting: [],
   });
   const [lastUpdateTime, setLastUpdateTime] = useState<string | null>(null);
   const [isManualPageChange, setIsManualPageChange] = useState(false);
@@ -85,12 +102,12 @@ export default function DemoListesi3DataTable({
   const [selectedDemoId, setSelectedDemoId] = useState(null);
 
   const updateTableConfig = (updates: Partial<TableDesign>) => {
-    setTableConfig(prev => ({
+    setTableConfig((prev) => ({
       ...prev,
-      ...updates
+      ...updates,
     }));
-  };
-
+  };  const [pageSize, setPageSize] = useState(10);
+  
   // Table instance definition - MUST be before any useEffects that use it
   const table = useMaterialReactTable({
     columns,
@@ -106,69 +123,108 @@ export default function DemoListesi3DataTable({
     enableColumnOrdering: true,
     enableFacetedValues: true,
     columnResizeMode: "onChange",
-    enableDensityToggle: false,
-    enableFullScreenToggle: false,
-    enableHiding: true,
-
+    enableFullScreenToggle: false,    enableHiding: true,
+    enableDensityToggle: true,
+    enableRowActions: true,    renderRowActions: ({ row, table }) => (
+        <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
+          <IconButton
+            color="primary"
+            onClick={() =>
+              window.open(
+                `mailto:kevinvandy@mailinator.com?subject=Hello ${row.original.firstName}!`,
+              )
+            }
+          >
+            <EmailIcon />
+          </IconButton>
+        </Box>
+    ),rowsPerPageOptions: [5, 10, 20, 50, 100],
     state: {
       columnOrder: tableConfig.columnOrder,
       columnFilters: tableConfig.columnFilters,
       columnVisibility: tableConfig.columnVisibility,
       columnSizing: tableConfig.columnSizing,
       sorting: tableConfig.sorting,
-      pagination: { pageIndex: currentPageIndex, pageSize: 10 },
+      pagination: { pageIndex: currentPageIndex, pageSize: pageSize },
+    },    onPaginationChange: (updater) => {
+      if (typeof updater === "function") {
+        const newState = updater(table.getState().pagination);
+        setCurrentPageIndex(newState.pageIndex);
+        if (newState.pageSize !== pageSize) {
+          setPageSize(newState.pageSize);
+        }
+        setIsManualPageChange(true);
+        console.log("Pagination changed (function):", newState.pageIndex + 1, "Page size:", newState.pageSize);
+      } else {
+        setCurrentPageIndex(updater.pageIndex);
+        if (updater.pageSize !== pageSize) {
+          setPageSize(updater.pageSize);
+        }
+        setIsManualPageChange(true);
+        console.log("Pagination changed (direct):", updater.pageIndex + 1, "Page size:", updater.pageSize);
+      }
+      // Force re-render to update UI
+      setPaginationKey((prev) => prev + 1);
     },
 
     onColumnOrderChange: (updater) => {
-      const newOrder = typeof updater === 'function' 
-        ? updater(tableConfig.columnOrder) 
-        : updater;
-      console.log('Column order changing to:', newOrder);
+      const newOrder =
+        typeof updater === "function"
+          ? updater(tableConfig.columnOrder)
+          : updater;
+      console.log("Column order changing to:", newOrder);
       updateTableConfig({ columnOrder: newOrder });
     },
 
     onColumnFiltersChange: (updater) => {
-      const newFilters = typeof updater === 'function'
-        ? updater(tableConfig.columnFilters)
-        : updater;
+      const newFilters =
+        typeof updater === "function"
+          ? updater(tableConfig.columnFilters)
+          : updater;
       updateTableConfig({ columnFilters: newFilters });
     },
 
     onColumnSizingChange: (updater) => {
-      const newSizing = typeof updater === 'function' 
-        ? updater(tableConfig.columnSizing) 
-        : updater;
-      console.log('Column sizing changed:', newSizing);
+      const newSizing =
+        typeof updater === "function"
+          ? updater(tableConfig.columnSizing)
+          : updater;
+      console.log("Column sizing changed:", newSizing);
       updateTableConfig({ columnSizing: newSizing });
     },
 
     onColumnVisibilityChange: (updater) => {
-      const newVisibility = typeof updater === 'function'
-        ? updater(tableConfig.columnVisibility)
-        : updater;
-      console.log('Column visibility changed:', newVisibility);
+      const newVisibility =
+        typeof updater === "function"
+          ? updater(tableConfig.columnVisibility)
+          : updater;
+      console.log("Column visibility changed:", newVisibility);
       updateTableConfig({ columnVisibility: newVisibility });
     },
 
     onSortingChange: (updater) => {
-      const newSorting = typeof updater === 'function'
-        ? updater(tableConfig.sorting)
-        : updater;
+      const newSorting =
+        typeof updater === "function" ? updater(tableConfig.sorting) : updater;
       updateTableConfig({ sorting: newSorting });
     },
-
     muiTableBodyRowProps: ({ row }) => ({
       sx: {
         backgroundColor: row.index % 2 === 0 ? "#fff" : "#eaf5fa",
         "&:hover": {
-          backgroundColor: row.index % 2 === 0 ? "#fff" : "#d0e8f0",
+          backgroundColor: "skyblue",
+          cursor: "pointer",
         },
+
+        // Herhangi bir geçiş efektini kaldır
+        transition: "none !important",
       },
+      // onDoubleClick: () => handleRowClick(row),
     }),
     muiTableHeadCellProps: {
       sx: {
         backgroundColor: "#0e7490",
         color: "white",
+        borderBottom: "none", // Başlık altındaki çizgiyi kaldır
         "& .MuiIconButton-root": {
           color: "white",
         },
@@ -232,9 +288,10 @@ export default function DemoListesi3DataTable({
 
     if (tasarimParametre?.deger) {
       try {
-        const tasarimVerisi: TableDesign = typeof tasarimParametre.deger === "string" 
-          ? JSON.parse(tasarimParametre.deger) 
-          : tasarimParametre.deger;
+        const tasarimVerisi: TableDesign =
+          typeof tasarimParametre.deger === "string"
+            ? JSON.parse(tasarimParametre.deger)
+            : tasarimParametre.deger;
 
         console.log("Loading saved table design:", tasarimVerisi);
 
@@ -248,7 +305,7 @@ export default function DemoListesi3DataTable({
         }
 
         if (tasarimVerisi.columnVisibility) {
-          table.setColumnVisibility(tasarimVerisi.columnVisibility); 
+          table.setColumnVisibility(tasarimVerisi.columnVisibility);
         }
 
         if (tasarimVerisi.sorting) {
@@ -265,7 +322,7 @@ export default function DemoListesi3DataTable({
           columnFilters: tasarimVerisi.columnFilters || [],
           columnSizing: tasarimVerisi.columnSizing || {},
           columnVisibility: tasarimVerisi.columnVisibility || {},
-          sorting: tasarimVerisi.sorting || []
+          sorting: tasarimVerisi.sorting || [],
         });
 
         if (tasarimParametre.kayitzamani) {
@@ -278,17 +335,16 @@ export default function DemoListesi3DataTable({
       }
     }
   }, [parametersData, table]);
-
   // Effect to handle data changes and maintain pagination state
   useEffect(() => {
     if (!isManualPageChange && data) {
-      const totalPages = Math.ceil(data.length / 10);
+      const totalPages = Math.ceil(data.length / pageSize);
       if (currentPageIndex >= totalPages) {
         setCurrentPageIndex(Math.max(0, totalPages - 1));
       }
       setIsManualPageChange(false);
     }
-  }, [data, currentPageIndex, isManualPageChange]);
+  }, [data, currentPageIndex, isManualPageChange, pageSize]);
 
   // Clean up the timeout when the component unmounts
   useEffect(() => {
@@ -388,7 +444,9 @@ export default function DemoListesi3DataTable({
       // Get visible column headers, excluding mrt-row-spacer
       table
         .getAllColumns()
-        .filter((column) => column.getIsVisible() && column.id !== "mrt-row-spacer")
+        .filter(
+          (column) => column.getIsVisible() && column.id !== "mrt-row-spacer"
+        )
         .forEach((column) => {
           const header = String(column.columnDef.header || column.id);
           tableColumns.push(header);
@@ -399,13 +457,20 @@ export default function DemoListesi3DataTable({
         const rowData: (string | number)[] = [];
         table
           .getAllColumns()
-          .filter((column) => column.getIsVisible() && column.id !== "mrt-row-spacer")
+          .filter(
+            (column) => column.getIsVisible() && column.id !== "mrt-row-spacer"
+          )
           .forEach((column) => {
-            const cell = row.getAllCells().find((c) => c.column.id === column.id);
+            const cell = row
+              .getAllCells()
+              .find((c) => c.column.id === column.id);
             let value = "";
             if (cell) {
               const cellValue = cell.getValue();
-              value = cellValue !== null && cellValue !== undefined ? String(cellValue) : "";
+              value =
+                cellValue !== null && cellValue !== undefined
+                  ? String(cellValue)
+                  : "";
             }
             rowData.push(value);
           });
@@ -468,14 +533,21 @@ export default function DemoListesi3DataTable({
         const rowData: Record<string, string> = {};
         table
           .getAllColumns()
-          .filter((column) => column.getIsVisible() && column.id !== "mrt-row-spacer")
+          .filter(
+            (column) => column.getIsVisible() && column.id !== "mrt-row-spacer"
+          )
           .forEach((column) => {
             const header = String(column.columnDef.header || column.id);
-            const cell = row.getAllCells().find((c) => c.column.id === column.id);
+            const cell = row
+              .getAllCells()
+              .find((c) => c.column.id === column.id);
             let value = "";
             if (cell) {
               const cellValue = cell.getValue();
-              value = cellValue !== null && cellValue !== undefined ? String(cellValue) : "";
+              value =
+                cellValue !== null && cellValue !== undefined
+                  ? String(cellValue)
+                  : "";
             }
             rowData[header] = value;
           });
@@ -537,10 +609,10 @@ export default function DemoListesi3DataTable({
 
     try {
       const response = await axios.get(`${API_URL}/api/ayarlar/varsayilan/4`);
-      const tasarimVerisi: TableDesign = response.data?.deger 
-        ? (typeof response.data.deger === "string" 
-          ? JSON.parse(response.data.deger) 
-          : response.data.deger)
+      const tasarimVerisi: TableDesign = response.data?.deger
+        ? typeof response.data.deger === "string"
+          ? JSON.parse(response.data.deger)
+          : response.data.deger
         : response.data;
 
       if (tasarimVerisi) {
@@ -578,18 +650,20 @@ export default function DemoListesi3DataTable({
       console.error("Varsayılan tasarım getirme hatası:", error);
       toast.error(
         "Varsayılan tasarım yüklenirken hata oluştu: " +
-        ((error as any).response?.data?.message || (error as Error).message)
+          ((error as any).response?.data?.message || (error as Error).message)
       );
     }
   }
 
   function handleTasarimiKaydet() {
-    console.log('Saving table design:', tableConfig);
+    console.log("Saving table design:", tableConfig);
 
-    const parameterData: TableParameter[] = [{
-      parametreid: 4,
-      deger: tableConfig,
-    }];
+    const parameterData: TableParameter[] = [
+      {
+        parametreid: 4,
+        deger: tableConfig,
+      },
+    ];
 
     updateParametersMutation.mutate(parameterData);
     toast.info("Tablo tasarımı kaydediliyor...");
@@ -605,111 +679,143 @@ export default function DemoListesi3DataTable({
       });
     }
   }
+  // row a tıklandığında demo düzenleme sayfasına yönlendiricimiz
+  
+  // const handleRowClick = (row) => {
+  //   const demoId = row.original.id;
+  //   if (demoId) {
+  //     navigate(`/demoduzenle/${demoId}`);
+  //   } else {
+  //     toast.error("Demo ID bulunamadı");
+  //   }
+  // };
 
   return (
     <>
       {" "}
-      <div className="flex items-center gap-4">
+      <Accordion type="single" collapsible>
         {" "}
-        <Buttonshad
-          variant="outline"
-          size="sm"
-          asChild={false}
-          className="no-underline focus:ring-0 focus:ring-offset-0 focus:outline-none border-slate-300 shadow-none bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 flex items-center"
-          onClick={exportToPdf}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-1"
-          >
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-            <path d="M14 2v6h6" />
-            <path d="M16 13H8" />
-            <path d="M16 17H8" />
-            <path d="M10 9H8" />
-          </svg>
-          PDF'e Aktar
-        </Buttonshad>{" "}
-        <Buttonshad
-          size="sm"
-          variant="outline"
-          asChild={false}
-          className="h-8 focus:ring-0 focus:ring-offset-0 focus:outline-none border-slate-300 shadow-none bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 flex items-center"
-          style={{ boxShadow: "none", outline: "none" }}
-          onClick={exportToExcel}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-1"
-          >
-            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
-            <polyline points="14 2 14 8 20 8" />
-            <path d="M8 13h2" />
-            <path d="M8 17h2" />
-            <path d="M14 13h2" />
-            <path d="M14 17h2" />
-          </svg>
-          Excel'e Aktar
-        </Buttonshad>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Buttonshad
-              size="sm"
-              variant="outline"
-              className="h-8 focus:ring-0 focus:ring-offset-0 focus:outline-none border-slate-300 shadow-none flex items-center gap-2"
-              style={{ boxShadow: "none", outline: "none" }}
-            >
-              İşlemler <ChevronDown className="h-4 w-4" />
-            </Buttonshad>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            <DropdownMenuLabel inset className="font-normal">
-              Tablo Ayarları
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator className="my-1" />
-            <DropdownMenuGroup className="normal-case">              <DropdownMenuItem
-                inset
-                className="cursor-pointer"
-                onClick={handleTasarimiKaydet}
+        <AccordionItem value="item-1">
+          <AccordionTrigger className="h-8 bg-slate-300 text-cyan-700 font-semibold text-sm px-4 py-2 rounded-t-sm flex justify-end hover:no-underline hover:text-cyan-600 focus:outline-none no-underline">
+            Diğer İşlemler
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="flex gap-2 mt-3 w-full justify-end">
+              <Buttonshad
+                variant="outline"
+                size="sm"
+                asChild={false}
+                className="no-underline focus:ring-0 focus:ring-offset-0 focus:outline-none border-slate-300 shadow-none bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 flex items-center"
+                onClick={exportToPdf}
               >
-                <span>Tasarımı Kaydet</span>
-                <DropdownMenuShortcut className="ml-auto">
-                  ⇧⌘P
-                </DropdownMenuShortcut>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                inset
-                className="cursor-pointer"
-                onClick={handleVarsayilanTasarim}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mr-1"
+                >
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <path d="M14 2v6h6" />
+                  <path d="M16 13H8" />
+                  <path d="M16 17H8" />
+                  <path d="M10 9H8" />
+                </svg>
+                PDF'e Aktar
+              </Buttonshad>{" "}
+              <Buttonshad
+                size="sm"
+                variant="outline"
+                asChild={false}
+                className="h-8 focus:ring-0 focus:ring-offset-0 focus:outline-none border-slate-300 shadow-none bg-green-50 text-green-600 hover:bg-green-100 hover:text-green-700 flex items-center"
+                style={{ boxShadow: "none", outline: "none" }}
+                onClick={exportToExcel}
               >
-                <span>Tasarımı Sıfırla</span>
-                <DropdownMenuShortcut className="ml-auto">
-                  ⌘B
-                </DropdownMenuShortcut>
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator className="my-1" />
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-      <MaterialReactTable table={table} />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="mr-1"
+                >
+                  <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+                  <polyline points="14 2 14 8 20 8" />
+                  <path d="M8 13h2" />
+                  <path d="M8 17h2" />
+                  <path d="M14 13h2" />
+                  <path d="M14 17h2" />
+                </svg>
+                Excel'e Aktar
+              </Buttonshad>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Buttonshad
+                    size="sm"
+                    variant="outline"
+                    className="h-8 focus:ring-0 focus:ring-offset-0 focus:outline-none border-slate-300 shadow-none flex items-center gap-2"
+                    style={{ boxShadow: "none", outline: "none" }}
+                  >
+                    Tablo Tasarım Ayarları <ChevronDown className="h-4 w-4" />
+                  </Buttonshad>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56">
+                  <DropdownMenuLabel inset className="font-normal">
+                    Tablo Ayarları
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="my-1" />
+                  <DropdownMenuGroup className="normal-case">
+                    {" "}
+                    <DropdownMenuItem
+                      inset
+                      className="cursor-pointer"
+                      onClick={handleTasarimiKaydet}
+                    >
+                      <span>Tasarımı Kaydet</span>
+                      <DropdownMenuShortcut className="ml-auto">
+                        ⇧⌘P
+                      </DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      inset
+                      className="cursor-pointer"
+                      onClick={handleVarsayilanTasarim}
+                    >
+                      <span>Tasarımı Sıfırla</span>
+                      <DropdownMenuShortcut className="ml-auto">
+                        ⌘B
+                      </DropdownMenuShortcut>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="my-1" />
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+      <div className="flex items-center gap-4"> </div>{" "}
+      <div className=" text-sm text-slate-500 italic"></div>
+      <MaterialReactTable
+        table={table}
+        muiTableProps={{
+          sx: {
+            "& tbody tr": {
+              transition: "background-color 0.2s",
+            },
+          },
+        }}
+        
+      />
     </>
   );
 }
