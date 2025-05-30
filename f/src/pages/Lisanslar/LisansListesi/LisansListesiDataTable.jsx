@@ -749,7 +749,7 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
               {error}
             </div>
           )}
-          <div className="grid grid-cols-8 gap-4 p-2 my-1">
+          <div className="flex flex-wrap gap-4 p-2 my-1">
             <FormField
               control={form.control}
               name="lisans_arama"
@@ -978,7 +978,8 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
               )}
             />
 
-            <div className="flex items-end gap-4 ">              <Button
+            <div className="flex justify-end items-end gap-4 ml-auto">
+              <Button
                 className="bg-blue-600 hover:bg-blue-500 active:bg-blue-400 h-9 w-28 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200 flex items-center justify-center"
                 type="submit"
               >
@@ -1075,7 +1076,7 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
               </svg>
             }
           />          <Button
-            className="bg-emerald-500 hover:bg-emerald-600 active:bg-cyan-700 h-9 w-28 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200 flex items-center justify-center"
+            className="bg-emerald-500 hover:bg-emerald-600 active:bg-cyan-700 h-9 w-28 text-white font-semibold py-2 mr-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200 flex items-center justify-center"
             onClick={() => refreshData()}
           >
             <svg

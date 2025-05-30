@@ -588,9 +588,8 @@ export default function BayiEkle() {
       <div className="h-full w-full ">
         <div className="h-full w-full p-1 ">
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="bg-white p-4 rounded-lg shadow-md max-h-[calc(100vh-120px)] overflow-y-auto shadow-slate-300  "
+            <form              onSubmit={form.handleSubmit(onSubmit)}
+              className="bg-white p-4 rounded-lg shadow-md shadow-slate-300"
             >
               {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">

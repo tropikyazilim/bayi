@@ -482,10 +482,9 @@ export default function LisansEkle() {
   return (
     <div className="min-h-screen w-full bg-gray-100 flex items-start justify-center pt-0 pb-8">
       <div className="w-full mx-auto p-1">
-        <Form {...form}>
-          <form
+        <Form {...form}>          <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="bg-white p-5 rounded-xl shadow-lg max-h-[calc(100vh-40px)] overflow-y-auto border border-gray-200"
+            className="bg-white p-5 rounded-xl shadow-lg border border-gray-200"
           >
             {error && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">

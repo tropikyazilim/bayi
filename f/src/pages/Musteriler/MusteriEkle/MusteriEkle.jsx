@@ -518,9 +518,8 @@ export default function MusteriEkle() {
       <div className="h-full w-full">
         <div className="h-full w-full p-1">
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="bg-white p-4 rounded-lg shadow-md max-h-[calc(100vh-120px)] overflow-y-auto shadow-slate-300  "
+            <form              onSubmit={form.handleSubmit(onSubmit)}
+              className="bg-white p-4 rounded-lg shadow-md shadow-slate-300"
             >
               {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
@@ -529,7 +528,7 @@ export default function MusteriEkle() {
               )}
               <div className="mb-6">
                 <h1 className="text-2xl font-bold text-white py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
-                  Müşteri EKle
+                  Müşteri Ekle
                 </h1>
                 
               </div>

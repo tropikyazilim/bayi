@@ -25,12 +25,9 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query"; // React Query eklendi
 
 export default function MusteriDataTable({ columns, data }) {
-  const navigate = useNavigate(); // Hook fonksiyon içine taşındı
-  const [error, setError] = useState(null);
-  const queryClient = useQueryClient(); // QueryClient'ı al
+  const navigate = useNavigate();
   const [filtering, setFiltering] = useState("");
 
-  //tablo yapılandırması
   const table = useReactTable({
     data,
     columns,
@@ -46,7 +43,10 @@ export default function MusteriDataTable({ columns, data }) {
     state: {
       globalFilter: filtering,
     },
-    onGlobalFilterChange: setFiltering,  });  return (
+    onGlobalFilterChange: setFiltering,
+  });
+
+  return (
     <div className="h-full flex flex-col">
       {/* Arama kutusu */}
       <div className="flex items-center py-2 justify-between">
@@ -58,65 +58,82 @@ export default function MusteriDataTable({ columns, data }) {
         />
       </div>
       
-      {/* Tablo ve Scroll Container - Tek bir scroll container */}
-      <div className="rounded-md border overflow-x-auto" style={{ minWidth: "100%" }}>
-        <div style={{ minWidth: "1200px" }}>
-          <Table style={{ tableLayout: "fixed", width: "100%" }}>            <TableHeader className="bg-cyan-700">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="hover:bg-cyan-700">
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id} className="text-white">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row,index) => (                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className={
-                        index % 2 === 0
-                          ? "bg-white hover:bg-[#edf7fa] h-12" // Burada h-14 (3.5rem - 56px) yükseklik eklenmiştir
-                          : "bg-[#f3fafe] hover:bg-[#e5f5fa] h-12" // Burada h-14 (3.5rem - 56px) yükseklik eklenmiştir
-                      }
-                  onClick={() => {
-                    // BayiEkle sayfasına yönlendir
-                    navigate(`/musteri/${row.original.id}`); // BayiEkle sayfasına git
-                    console.log("Row clicked:", row.original);
-                  }}
-                >                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-3">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
+      {/* Ana tablo konteyneri - Responsive */}
+      <div className="flex-1 border rounded-md w-full">
+        {/* Tablo başlığı - Sabit */}
+        <div className="rounded-t-md">
+          <div className="overflow-x-auto">
+            <div style={{ minWidth: "1200px" }}>
+              <Table>
+                <TableHeader className="bg-cyan-700">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id} className="hover:bg-cyan-700">
+                      {headerGroup.headers.map((header) => (
+                        <TableHead key={header.id} className="text-white">
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </TableHead>
+                      ))}
+                    </TableRow>
                   ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Kayıt bulunamadı.
-                </TableCell>              </TableRow>
-            )}            </TableBody>
-          </Table>
-          
-          {/* Pagination Footer - İçeride, tablo genişliğiyle uyumlu */}
-          <div className="py-4 flex items-center justify-between gap-2 px-4">
+                </TableHeader>
+              </Table>
+            </div>
+          </div>
+        </div>
+
+        {/* Tablo gövdesi - Sabit genişlikte ve kaydırılabilir */}
+        <div className="overflow-x-auto border-y">
+          <div style={{ minWidth: "1200px" }}>
+            <Table>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row, index) => (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                      className={
+                        index % 2 === 0
+                          ? "bg-white hover:bg-[#edf7fa] h-12"
+                          : "bg-[#f3fafe] hover:bg-[#e5f5fa] h-12"
+                      }
+                      onClick={() => {
+                        navigate(`/musteri/${row.original.id}`);
+                        console.log("Row clicked:", row.original);
+                      }}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="py-3">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length}
+                      className="h-24 text-center"
+                    >
+                      Kayıt bulunamadı.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </div>
+
+        {/* Sayfalama - Responsive konteyner içinde sabit */}
+        <div className="py-4 px-4">
+          <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
               Toplam {table.getFilteredRowModel().rows.length} kayıt
             </div>
