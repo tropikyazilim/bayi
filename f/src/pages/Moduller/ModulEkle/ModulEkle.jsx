@@ -54,7 +54,9 @@ const formSchema = z.object({
 export default function ModulEkle() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient();  // API URL'ini çevre değişkeninden al
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
 
   // Parametreleri getirmek için useQuery kullanımı
   const {
@@ -65,7 +67,7 @@ export default function ModulEkle() {
     queryKey: ["parametreler"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/ayarlar");
+        const response = await axios.get(`${apiUrl}/api/ayarlar`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);
@@ -100,11 +102,9 @@ export default function ModulEkle() {
         );
       }
     }
-  }, [parametersData, form]);
-
-  const createModulMutation = useMutation({
+  }, [parametersData, form]);  const createModulMutation = useMutation({
     mutationFn: (ModulData) => {
-      return axios.post("http://localhost:3002/api/moduller", ModulData);
+      return axios.post(`${apiUrl}/api/moduller`, ModulData);
     },
     onSuccess: () => {
       setSuccess(true);

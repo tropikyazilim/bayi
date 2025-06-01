@@ -411,6 +411,9 @@ const formSchema = z.object({
 });
 
 export default function BayiDuzenle() {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
+
   const { id } = useParams();
   const navigate = useNavigate();
   const [openBayiTipi, setOpenBayiTipi] = React.useState(false);
@@ -456,7 +459,7 @@ export default function BayiDuzenle() {
     queryKey: ["cities"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/cities");
+        const response = await axios.get(`${apiUrl}/api/cities`);
         console.log("İl ve ilçe verileri yüklendi:", response.data);
         return response.data;
       } catch (error) {
@@ -492,7 +495,7 @@ export default function BayiDuzenle() {
     queryFn: async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3002/api/bayiler/${id}`
+          `${apiUrl}/api/bayiler/${id}`
         );
         console.log("Bayi verileri yüklendi:", response.data);
         return response.data;
@@ -604,12 +607,12 @@ export default function BayiDuzenle() {
       if (id) {
         // Güncelleme işlemi
         return axios.put(
-          `http://localhost:3002/api/bayiler/${id}`,
+          `${apiUrl}/api/bayiler/${id}`,
           bayilerData
         );
       } else {
         // Yeni kayıt işlemi
-        return axios.post("http://localhost:3002/api/bayiler", bayilerData);
+        return axios.post(`${apiUrl}/api/bayiler`, bayilerData);
       }
     },
     onSuccess: (data) => {
@@ -1211,27 +1214,34 @@ export default function BayiDuzenle() {
               />
 
               <div className="flex justify-end space-x-4 pt-8 border-t border-gray-100 mt-4">
-                                            <Button
-                                              type="button"
-                                              onClick={() => {
-                                                form.reset();
-                                                navigate("/bayilistesi/");
-                                              }}
-                                              className="bg-red-400 text-white border border-gray-300 hover:bg-red-600 h-11 text-sm rounded-lg px-5 font-medium transition-all shadow-sm flex items-center group"
-                                            >
-                                              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-white group-hover:text-white transition-colors" viewBox="0 0 20 20" fill="currentColor">
-                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                              </svg>
-                                              İptal
-                                            </Button>
+                <Button
+                  type="button"
+                  onClick={() => {
+                    form.reset();
+                    navigate("/bayilistesi/");
+                  }}
+                  className="bg-red-400 text-white border border-gray-300 hover:bg-red-600 h-11 text-sm rounded-lg px-5 font-medium transition-all shadow-sm flex items-center group"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-1.5 text-white group-hover:text-white transition-colors"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  İptal
+                </Button>
                 <Button
                   type="submit"
                   disabled={handleBayiMutation.isPending}
                   className="bg-teal-500 hover:bg-teal-600 text-white h-11 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center relative"
                 >
-                  {handleBayiMutation.isPending
-                    ? "Gönderiliyor..."
-                    : "Kaydet"}
+                  {handleBayiMutation.isPending ? "Gönderiliyor..." : "Kaydet"}
                 </Button>
               </div>
               {/* </div> */}

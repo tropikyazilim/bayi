@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/form";
 
 export function DataTable({ columns, data, refetch }) {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
   const [error, setError] = useState(null);
   const [filterParams, setFilterParams] = useState({}); // Filtreleme parametrelerini saklayacak state
   const queryClient = useQueryClient(); // QueryClient'ı al
@@ -104,7 +106,7 @@ export function DataTable({ columns, data, refetch }) {
           console.log("Filtreleme isteği yapılıyor", queryParams.toString());
           // Filtreleme API'sine istek gönder
           const response = await axios.get(
-            `http://localhost:3002/api/bayiler/filter?${queryParams.toString()}`
+            `${apiUrl}/api/bayiler/filter?${queryParams.toString()}`
           );
 
           // Kullanıcıya sonucu bildir
@@ -194,7 +196,7 @@ export function DataTable({ columns, data, refetch }) {
 
           console.log("Manuel filtreleme isteği yapılıyor");
           const response = await axios.get(
-            `http://localhost:3002/api/bayiler/filter?${queryParams.toString()}`
+            `${apiUrl}/api/bayiler/filter?${queryParams.toString()}`
           );
 
           // Sorgudan gelen verileri direkt olarak TableData'ya da ayarlayalım

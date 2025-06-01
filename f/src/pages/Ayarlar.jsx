@@ -67,6 +67,9 @@ export default function Ayarlar() {
     is_demo_ayar: z.enum(["E", "H"]).default("H"),
   });
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -83,7 +86,7 @@ export default function Ayarlar() {
       const dataJson = JSON.stringify(parameterData);
       console.log("Stringified data:", dataJson);
 
-      return axios.put("http://localhost:3002/api/ayarlar", dataJson, {
+      return axios.put(`${apiUrl}/api/ayarlar`, dataJson, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -208,7 +211,7 @@ export default function Ayarlar() {
     queryKey: ["parametreler"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/ayarlar");
+        const response = await axios.get(`${apiUrl}/api/ayarlar`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);

@@ -397,6 +397,8 @@ export default function MusteriEkle() {
   const [citiesData, setCitiesData] = useState(null);
 
   const queryClient = useQueryClient();
+   const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -424,7 +426,7 @@ export default function MusteriEkle() {
     queryKey: ["cities"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/cities");
+        const response = await axios.get(`${apiUrl}/api/cities`);
         console.log("İl ve ilçe verileri yüklendi:", response.data);
         return response.data;
       } catch (error) {
@@ -470,7 +472,7 @@ export default function MusteriEkle() {
 
   const createMusteriMutation = useMutation({
     mutationFn: (musteriData) => {
-      return axios.post("http://localhost:3002/api/musteriler", musteriData);
+      return axios.post(`${apiUrl}/api/musteriler`, musteriData);
     },
     onSuccess: () => {
       setSuccess(true);

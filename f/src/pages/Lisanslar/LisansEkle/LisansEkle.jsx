@@ -98,6 +98,8 @@ export default function LisansEkle() {
   const [lastLisansKodu, setLastLisansKodu] = useState("");
   const [bayiSearch, setBayiSearch] = useState("");
   const queryClient = useQueryClient();
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
   // Parametreleri getirmek için useQuery kullanımı
   const {
     data: parametersData,
@@ -107,7 +109,7 @@ export default function LisansEkle() {
     queryKey: ["parametreler"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/ayarlar");
+        const response = await axios.get(`${apiUrl}/api/ayarlar`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);
@@ -168,7 +170,7 @@ export default function LisansEkle() {
     queryKey: ["moduller"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/moduller");
+        const response = await axios.get(`${apiUrl}/api/moduller`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);
@@ -196,7 +198,7 @@ export default function LisansEkle() {
 
       try {
         const response = await axios.get(
-          `http://localhost:3002/api/paketler/${selectedPaketId}`
+          `${apiUrl}/api/paketler/${selectedPaketId}`
         );
         console.log("Paket modülleri yüklendi:", response.data);
         // API yanıtının yapısını kontrol et
@@ -292,9 +294,7 @@ export default function LisansEkle() {
     queryKey: ["bayiler"],
     queryFn: async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3002/api/bayiler/unvan"
-        );
+        const response = await axios.get(`${apiUrl}/api/bayiler/unvan`);
         console.log("Bayiler verileri alındı:", response.data);
         return response.data;
       } catch (error) {
@@ -320,9 +320,7 @@ export default function LisansEkle() {
     queryKey: ["musteriler"],
     queryFn: async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3002/api/musteriler/unvan"
-        );
+        const response = await axios.get(`${apiUrl}/api/musteriler/unvan`);
         console.log("Müşteri verileri alındı:", response.data);
         return response.data;
       } catch (error) {
@@ -348,9 +346,7 @@ export default function LisansEkle() {
     queryKey: ["paketler"],
     queryFn: async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3002/api/paketler/paket_adi"
-        );
+        const response = await axios.get(`${apiUrl}/api/paketler/paket_adi`);
         console.log("Paket verileri alındı:", response.data);
         return response.data;
       } catch (error) {
@@ -377,7 +373,7 @@ export default function LisansEkle() {
     queryFn: async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3002/api/paketler/${id}`
+          `${apiUrl}/api/paketler/${id}`
         );
         console.log("Paket duzenle verileri yüklendi:", response.data);
         return response.data;
@@ -423,7 +419,7 @@ export default function LisansEkle() {
   }, [paketIdData, form]);
   const createLisansEkleMutation = useMutation({
     mutationFn: (LisansData) => {
-      return axios.post("http://localhost:3002/api/lisanslar", LisansData);
+      return axios.post(`${apiUrl}/api/lisanslar`, LisansData);
     },
     onSuccess: () => {
       setSuccess(true);

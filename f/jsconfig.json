@@ -6,6 +6,9 @@
     },
     "jsx": "react-jsx",
     "strict": true,
-    
-  }
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "typeRoots": ["./node_modules/@types", "./src"]
+  },
+  "include": ["src/**/*", "vite.config.js"]
 }

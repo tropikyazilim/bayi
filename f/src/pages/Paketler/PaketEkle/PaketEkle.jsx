@@ -33,6 +33,9 @@ export default function PaketEkle() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
 
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -45,7 +48,7 @@ export default function PaketEkle() {
 
   const createTestMutation = useMutation({
     mutationFn: (TestData) => {
-      return axios.post("http://localhost:3002/api/paketler", TestData);
+      return axios.post(`${apiUrl}/api/paketler`, TestData);
     },
     onSuccess: () => {
       setSuccess(true);
@@ -94,7 +97,7 @@ export default function PaketEkle() {
     queryKey: ["moduller"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/moduller");
+        const response = await axios.get(`${apiUrl}/api/moduller`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);

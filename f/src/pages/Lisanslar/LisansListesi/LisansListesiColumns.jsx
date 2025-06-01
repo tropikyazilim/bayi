@@ -8,7 +8,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
-
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
 export const columns = [  {
     accessorKey: "lisans_kodu",    header: ({ column }) => (
       <div onClick={() => column.toggleSorting(column.getIsSorted() === "asc")} className="flex items-center justify-center">
@@ -252,7 +253,7 @@ export const columns = [  {
       const toggleAktifMutation = useMutation({
         mutationFn: async (newValue) => {
           const response = await axios.put(
-            `http://localhost:3002/api/lisanslar/${row.original.id}/toggle-aktif`,
+            `${apiUrl}/api/lisanslar/${row.original.id}/toggle-aktif`,
             {
               aktif: newValue,
             }
@@ -317,7 +318,7 @@ export const columns = [  {
       const toggleKilitMutation = useMutation({
         mutationFn: async (newValue) => {
           const response = await axios.put(
-            `http://localhost:3002/api/lisanslar/${row.original.id}/toggle-kilit`,
+            `${apiUrl}/api/lisanslar/${row.original.id}/toggle-kilit`,
             {
               kilit: newValue,
             }

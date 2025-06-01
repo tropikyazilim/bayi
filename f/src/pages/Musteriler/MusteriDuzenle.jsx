@@ -146,6 +146,9 @@ const iller = [
 ];
 
 export default function MusteriDuzenle() {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
+
   const { id } = useParams();
   const navigate = useNavigate();
   const [success, setSuccess] = useState(false);
@@ -184,7 +187,7 @@ export default function MusteriDuzenle() {
     queryKey: ["cities"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/cities");
+        const response = await axios.get(`${apiUrl}/api/cities`);
         console.log("İl ve ilçe verileri yüklendi:", response.data);
         return response.data;
       } catch (error) {
@@ -218,7 +221,7 @@ export default function MusteriDuzenle() {
     queryFn: async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3002/api/musteriler/${id}`
+          `${apiUrl}/api/musteriler/${id}`
         );
         console.log("Müşteri verileri yüklendi:", response.data);
         return response.data;
@@ -312,12 +315,12 @@ export default function MusteriDuzenle() {
       if (id) {
         // Güncelleme işlemi
         return axios.put(
-          `http://localhost:3002/api/musteriler/${id}`,
+          `${apiUrl}/api/musteriler/${id}`,
           musteriData
         );
       } else {
         // Yeni kayıt işlemi
-        return axios.post("http://localhost:3002/api/musteriler", musteriData);
+        return axios.post(`${apiUrl}/api/musteriler`, musteriData);
       }
     },
     onSuccess: (data) => {
@@ -763,13 +766,11 @@ export default function MusteriDuzenle() {
               İptal
             </Button>
             <Button
-                              type="submit"
-                              
-                              className="bg-teal-500 hover:bg-teal-600 text-white h-11 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center relative"
-                            >
-                              Kaydet
-                            </Button>
-            
+              type="submit"
+              className="bg-teal-500 hover:bg-teal-600 text-white h-11 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center relative"
+            >
+              Kaydet
+            </Button>
           </div>
         </form>
       </Form>

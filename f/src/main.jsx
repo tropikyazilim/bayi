@@ -5,7 +5,7 @@ import { Toaster } from 'sonner'
 import './index.css'
 import App from './App.jsx'
 import { ClerkProvider } from '@clerk/clerk-react'
-import { neobrutalism, dark } from '@clerk/themes'
+import { neobrutalism } from '@clerk/themes'
 import { trTR } from '@clerk/localizations'
 
 
@@ -13,6 +13,7 @@ const clerk_key = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 if (!clerk_key) {
   throw new Error('VITE_CLERK_PUBLISHABLE_KEY is not defined')
 }
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -25,16 +26,20 @@ const queryClient = new QueryClient({
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ClerkProvider appearance={{
-        baseTheme: neobrutalism,
+    <ClerkProvider
+      publishableKey={clerk_key}
+      appearance={{
+        baseTheme: neobrutalism
       }}
-       publishableKey={clerk_key}
-       localization={trTR}
-       >
-    <QueryClientProvider client={queryClient}>
-      <App />
-      <Toaster position="bottom-right" richColors closeButton />
-    </QueryClientProvider>
+      localization={trTR}
+      frontendApi="https://bayi.volkankok.dev/clerk"
+      domain="bayi.volkankok.dev"
+      proxyUrl="/clerk"
+    >
+      <QueryClientProvider client={queryClient}>
+        <App />
+        <Toaster position="bottom-right" richColors closeButton />
+      </QueryClientProvider>
     </ClerkProvider>
   </StrictMode>
 )

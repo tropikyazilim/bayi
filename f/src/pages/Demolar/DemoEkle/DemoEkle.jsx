@@ -49,20 +49,20 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 const formSchema = z.object({
-    firma_adi: z.string().min(1, "Firma adı gereklidir"),
-    adsoyad: z.string().min(1, "Ad-Soyad gereklidir"),
-    telefon: z
-        .string()
-        .regex(
-            /^0[0-9]{10}$/,
-            "Telefon 0 ile başlamalı ve toplam 11 haneli olmalıdır"
-        ),
-    email: z.string().email("Geçerli bir email adresi giriniz"),
-    il: z.string().min(1, "İl seçimi gereklidir"),
-    aciklama: z.string().min(10, "En az 10 karakter giriniz"),
-    kvkk: z.boolean().refine((val) => val === true, {
-        message: "KVKK metnini kabul etmeniz gerekmektedir",
-    }),
+  firma_adi: z.string().min(1, "Firma adı gereklidir"),
+  adsoyad: z.string().min(1, "Ad-Soyad gereklidir"),
+  telefon: z
+    .string()
+    .regex(
+      /^0[0-9]{10}$/,
+      "Telefon 0 ile başlamalı ve toplam 11 haneli olmalıdır"
+    ),
+  email: z.string().email("Geçerli bir email adresi giriniz"),
+  il: z.string().min(1, "İl seçimi gereklidir"),
+  aciklama: z.string().min(10, "En az 10 karakter giriniz"),
+  kvkk: z.boolean().refine((val) => val === true, {
+    message: "KVKK metnini kabul etmeniz gerekmektedir",
+  }),
 });
 
 const iller = [
@@ -397,10 +397,11 @@ export default function DemoEkle() {
   const [error, setError] = useState(null);
   const [openIller, setOpenIller] = React.useState(false);
   const queryClient = useQueryClient();
-    const [selectedIl, setSelectedIl] = useState(null);
-    const navigate = useNavigate();
-    
+  const [selectedIl, setSelectedIl] = useState(null);
+  const navigate = useNavigate();
 
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
 
   // Parametreleri getirmek için useQuery kullanımı
   const {
@@ -411,7 +412,7 @@ export default function DemoEkle() {
     queryKey: ["parametreler"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/ayarlar");
+        const response = await axios.get(`${apiUrl}/api/ayarlar`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);
@@ -422,19 +423,18 @@ export default function DemoEkle() {
     refetchOnReconnect: false,
   });
 
-const form = useForm({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-        firma_adi: "",
-        adsoyad: "",
-        telefon: "0",
-        email: "",
-        il: "",
-        aciklama: "",
-        kvkk: false
-        
+      firma_adi: "",
+      adsoyad: "",
+      telefon: "0",
+      email: "",
+      il: "",
+      aciklama: "",
+      kvkk: false,
     },
-});
+  });
 
   // Parametreler yüklendiğinde form alanlarını doldur
   useEffect(() => {
@@ -455,14 +455,14 @@ const form = useForm({
 
   const createDemoMutation = useMutation({
     mutationFn: (DemoData) => {
-      return axios.post("http://localhost:3002/api/demolar", DemoData);
+      return axios.post(`${apiUrl}/api/demolar`, DemoData);
     },
     onSuccess: () => {
       setSuccess(true);
       setError(null);
       form.reset();
       // Modüller listesini güncelle
-    //   queryClient.invalidateQueries(["demolar"]);
+      //   queryClient.invalidateQueries(["demolar"]);
 
       toast.success("Demo başarıyla eklendi", {
         description: "İşlem başarıyla tamamlandı",
@@ -492,32 +492,30 @@ const form = useForm({
       try {
         const response = await axios.get("https://api.ipify.org?format=json");
         const userIp = response.data.ip;
-        
-        
+
         // IP adresini form verilerine ekleyelim
         const formDataWithIp = {
           ...values,
-          ip: userIp
+          ip: userIp,
         };
-        
+
         console.log("Form başarıyla gönderildi!");
         console.log("Form Verileri :", formDataWithIp);
         console.log("Form hataları:", form.formState.errors);
-        
+
         // IP eklenmiş veriyi API'ye gönder
         createDemoMutation.mutate(formDataWithIp);
       } catch (error) {
         console.error("IP adresi alınamadı:", error);
-   
       }
     };
 
     // IP adresini al ve formu gönder
     getIpAddress();
-    
+
     setSuccess(false);
     setError(null);
-    
+
     // Form verileri validasyondan geçerse toast mesajı gösterme
     toast.success("Form başarıyla gönderildi", {
       description: "Talebiniz alınmıştır, en kısa sürede dönüş yapılacaktır.",
@@ -527,9 +525,6 @@ const form = useForm({
         color: "#166534",
       },
     });
-    
-    
-    
   }
 
   return (
@@ -681,7 +676,6 @@ const form = useForm({
                             open={openIller}
                             onOpenChange={(open) => {
                               setOpenIller(open);
-                              
                             }}
                           >
                             <PopoverTrigger asChild>
@@ -787,22 +781,22 @@ const form = useForm({
                             Kişisel Verilerin Korunması Kanunu İşbu 6698 Sayılı
                             Kişisel Verilerin Korunması Kanunu ile yürürlükteki
                             yasal mevzuata uygun olarak ve 6698 sayılı Kişisel
-                            Verilerin Korunması Kanunu ("Kanun") kapsamında "Veri
-                            Sorumlusu" sıfatıyla DEV BROS LTD ŞTİ.'ye ("Şirket")
-                            ait www.devbros.com.tr alan adlı internet sitesinin
-                            kullanması ile bağlantılı olarak elde edilen ve
-                            tarafımızca sağlanan verilerin toplanması, işlenmesi
-                            ve kullanım türü, derecesi ve amacı ile ilgili olarak
-                            siz kullanıcılarımıza bilgilendirme yapılması
-                            amaçlanmaktadır.
+                            Verilerin Korunması Kanunu ("Kanun") kapsamında
+                            "Veri Sorumlusu" sıfatıyla DEV BROS LTD ŞTİ.'ye
+                            ("Şirket") ait www.devbros.com.tr alan adlı internet
+                            sitesinin kullanması ile bağlantılı olarak elde
+                            edilen ve tarafımızca sağlanan verilerin toplanması,
+                            işlenmesi ve kullanım türü, derecesi ve amacı ile
+                            ilgili olarak siz kullanıcılarımıza bilgilendirme
+                            yapılması amaçlanmaktadır.
                             <br />
                             <br />
-                            www.devbros.com.tr alan adlı internet sitesi DEV BROS
-                            LTD ŞTİ. tarafından işletilmektedir. Şirket
+                            www.devbros.com.tr alan adlı internet sitesi DEV
+                            BROS LTD ŞTİ. tarafından işletilmektedir. Şirket
                             kullanıcıların kişisel verilerinin yönetilmesinde
                             sorumlu kuruluştur. İşbu madde kapsamındaki
-                            bilgilendirme 6698 sayılı "Kişisel Verilerin Korunması
-                            Kanunu" kapsamında yapılmaktadır.
+                            bilgilendirme 6698 sayılı "Kişisel Verilerin
+                            Korunması Kanunu" kapsamında yapılmaktadır.
                             <br />
                             <br />
                             Kişisel verilerinizinin, gizli bilgilerinizin
@@ -811,20 +805,20 @@ const form = useForm({
                             çalışanlarımızca ve servis sağlayıcılarımızca
                             görevlerini yerlerine getirirlerken gizliliklerine
                             mutlaka dikkat edilmesini ve yalnızca sizlere
-                            bildirdiğimiz amaçlarla kullanılmasını sağlamak üzere
-                            teknik ve idari önlemleri almaktayız.
+                            bildirdiğimiz amaçlarla kullanılmasını sağlamak
+                            üzere teknik ve idari önlemleri almaktayız.
                             <br />
                             <br />
-                            Kişisel verilerin işlenmesi, kişisel verilerin tamamen
-                            ve kısmen otomatik olan (çerezler) ya da herhangi bir
-                            veri kayıt sisteminin parçası olmak kaydıyla otomatik
-                            olmayan yollarla elde edilmesi, kaydedilmesi,
-                            depolanması, muhafaza edilmesi, değiştirilmesi,
-                            yeniden düzenlenmesi, açıklanması, aktarılması,
-                            devralınması, elde edilebilir hale getirilmesi,
-                            sınıflandırılması ya da kullanılmasının engellenmesi
-                            gibi kişilere ait veriler üzerinde gerçekleştirilen
-                            her türlü işlemi ifade etmektedir.
+                            Kişisel verilerin işlenmesi, kişisel verilerin
+                            tamamen ve kısmen otomatik olan (çerezler) ya da
+                            herhangi bir veri kayıt sisteminin parçası olmak
+                            kaydıyla otomatik olmayan yollarla elde edilmesi,
+                            kaydedilmesi, depolanması, muhafaza edilmesi,
+                            değiştirilmesi, yeniden düzenlenmesi, açıklanması,
+                            aktarılması, devralınması, elde edilebilir hale
+                            getirilmesi, sınıflandırılması ya da kullanılmasının
+                            engellenmesi gibi kişilere ait veriler üzerinde
+                            gerçekleştirilen her türlü işlemi ifade etmektedir.
                             <br />
                             <br />
                             İnternet sitesine üyeliği kapsamında bizlere
@@ -832,61 +826,64 @@ const form = useForm({
                             hizmet alımlarınız sırasında çerezler ve benzeri
                             yöntemler aracılığı edinilen bilgiler; bizim
                             tarafımızdan, mevcut ve ilerideki iştiraklerimiz,
-                            bağlı şirketlerimiz, hissedarlarımız, iş ortaklarımız,
-                            haleflerimiz, hizmet ve faaliyetlerimiz ile yan
-                            hizmetlerimizi yürütmek üzere hizmet aldığımız,
-                            işbirliği yaptığımız, yurt içinde ve/veya yurtdışında
-                            faaliyet gösteren program ortağı kuruluşlar ve diğer
-                            üçüncü kişiler (hukuk ve vergi danışmanlarımız,
-                            bankalar, bağımsız denetçiler dahil ve fakat bunlarla
-                            sınırlı olmamak üzere, sizlere hizmet sunabilmemiz
-                            için işbirliği yaptığımız veya yapabileceğimiz hizmet
+                            bağlı şirketlerimiz, hissedarlarımız, iş
+                            ortaklarımız, haleflerimiz, hizmet ve
+                            faaliyetlerimiz ile yan hizmetlerimizi yürütmek
+                            üzere hizmet aldığımız, işbirliği yaptığımız, yurt
+                            içinde ve/veya yurtdışında faaliyet gösteren program
+                            ortağı kuruluşlar ve diğer üçüncü kişiler (hukuk ve
+                            vergi danışmanlarımız, bankalar, bağımsız denetçiler
+                            dahil ve fakat bunlarla sınırlı olmamak üzere,
+                            sizlere hizmet sunabilmemiz için işbirliği
+                            yaptığımız veya yapabileceğimiz hizmet
                             tedarikçileri) ve/veya bunların belirleyecekleri
                             üçüncü kişiler/kuruluşlar tarafından muhtelif mal ve
                             hizmetlerin sağlanması ve her türlü bilgilendirme,
-                            reklam-tanıtım, promosyon, satış, pazarlama ve üyelik
-                            uygulamaları amaçlı yapılacak elektronik ve diğer
-                            ticari-sosyal iletişimler için, belirtilenler ve
-                            halefleri nezdinde süresiz olarak veya öngörecekleri
-                            süre ile kayda alınabilecek, basılı/manyetik
-                            arşivlerde saklanabilecek, gerekli görülen hallerde
-                            güncellenebilecek, paylaşılabilecek, aktarılabilecek,
-                            transfer edilebilecek, kullanılabilecek ve Kanun’un 5.
-                            ve 6. maddelerinde belirtilen kişisel veri işleme
-                            şartları ve amaçları dahilinde işlenebilecektir. Buna
-                            ek olarak Kanun dahil ilgili mevzuat hükümleri
-                            dahilinde zorunlu olması durumunda bazı uygulamalar ve
-                            işlemler için ayrıca ilave izniniz de
+                            reklam-tanıtım, promosyon, satış, pazarlama ve
+                            üyelik uygulamaları amaçlı yapılacak elektronik ve
+                            diğer ticari-sosyal iletişimler için, belirtilenler
+                            ve halefleri nezdinde süresiz olarak veya
+                            öngörecekleri süre ile kayda alınabilecek,
+                            basılı/manyetik arşivlerde saklanabilecek, gerekli
+                            görülen hallerde güncellenebilecek,
+                            paylaşılabilecek, aktarılabilecek, transfer
+                            edilebilecek, kullanılabilecek ve Kanun’un 5. ve 6.
+                            maddelerinde belirtilen kişisel veri işleme şartları
+                            ve amaçları dahilinde işlenebilecektir. Buna ek
+                            olarak Kanun dahil ilgili mevzuat hükümleri
+                            dahilinde zorunlu olması durumunda bazı uygulamalar
+                            ve işlemler için ayrıca ilave izniniz de
                             gerekebilecektir. Bu durumlarda sizlerle iletişime
-                            geçilecek ve sizlerin açık rızaları rica edilecektir.
-                            Bu verilere ek olarak bizlere iletmiş olduğunuz
-                            kişisel verileriniz hukukun gerekli kıldığı durumlarda
-                            resmi kurum/kuruluşlar, mahkemeler tarafından talep
-                            edilmesi halinde ilgili merci ve mahkemelere
-                            iletilebilecektir.
+                            geçilecek ve sizlerin açık rızaları rica
+                            edilecektir. Bu verilere ek olarak bizlere iletmiş
+                            olduğunuz kişisel verileriniz hukukun gerekli
+                            kıldığı durumlarda resmi kurum/kuruluşlar,
+                            mahkemeler tarafından talep edilmesi halinde ilgili
+                            merci ve mahkemelere iletilebilecektir.
                             <br />
                             <br />
                             Kişisel verileriniz internet sitemizde siz
                             kullanıcılarımıza daha iyi hizmet sunabilmesi,
                             hizmetlerimizin iyileştirebilmesi, ayrıca bu konuda
                             izin vermiş olmanız durumunda pazarlama
-                            faaliyetlerinde kullanılabilmesi, ürün/hizmet teklifi,
-                            her türlü bilgilendirme, reklam-tanıtım, promosyon,
-                            satış, pazarlama, mağaza kartı, kredi kartı ve üyelik
-                            uygulamaları, modelleme, raporlama, skorlama, internet
-                            sitesinin kullanımını kolaylaştırılması,
-                            kullanıcılarının ilgi alanlarına ve tercihlerine
-                            yönelik tarafımızca veya iştiraklerimiz tarafından
-                            yapılacak geliştirme çalışmalarda kullanılabilecektir.
-                            İnternet sitesi üzerinde yaptığınız hareketlerin
-                            çerezler ve benzeri yöntemlerle izlenebileceğini,
-                            kaydının tutulabileceğini, istatistiki veya yukarıda
+                            faaliyetlerinde kullanılabilmesi, ürün/hizmet
+                            teklifi, her türlü bilgilendirme, reklam-tanıtım,
+                            promosyon, satış, pazarlama, mağaza kartı, kredi
+                            kartı ve üyelik uygulamaları, modelleme, raporlama,
+                            skorlama, internet sitesinin kullanımını
+                            kolaylaştırılması, kullanıcılarının ilgi alanlarına
+                            ve tercihlerine yönelik tarafımızca veya
+                            iştiraklerimiz tarafından yapılacak geliştirme
+                            çalışmalarda kullanılabilecektir. İnternet sitesi
+                            üzerinde yaptığınız hareketlerin çerezler ve benzeri
+                            yöntemlerle izlenebileceğini, kaydının
+                            tutulabileceğini, istatistiki veya yukarıda
                             bahsedilen amaçlarla kullanılabilecektir. Ancak buna
                             ek olarak önemle belirtmek isteriz ki internet
                             sitemize üyelik, ürün veya hizmetlerimizin satın
-                            alınması ve bilgi güncelleme amaçlı girilen bilgiler,
-                            kredi kartı ve banka kartlarına ait gizli bilgiler
-                            diğer internet kullanıcıları tarafından
+                            alınması ve bilgi güncelleme amaçlı girilen
+                            bilgiler, kredi kartı ve banka kartlarına ait gizli
+                            bilgiler diğer internet kullanıcıları tarafından
                             görüntülenemez.
                             <br />
                             <br />
@@ -903,48 +900,50 @@ const form = useForm({
                             içeriklerinden hiçbir zaman sorumlu değildir.
                             <br />
                             <br />
-                            6698 Sayılı Kişisel Verilerin Korunması Kanunu’nun 11.
-                            maddesi uyarınca; kişisel verilerinizin işlenip
-                            işlenmediğini öğrenme, kişisel verileriniz işlenmişse
-                            buna ilişkin bilgi talep etme, kişisel verilerinizin
-                            işlenme amacını ve bunların amacına uygun kullanılıp
-                            kullanılmadığını öğrenme, yurt içinde veya yurt
-                            dışında kişisel verilerinizin aktarıldığı üçüncü
-                            kişileri bilme, kişisel verilerinizin eksik veya
-                            yanlış işlenmiş olması halinde bunların düzeltilmesini
-                            isteme ve bu kapsamda yapılan işleme ilişkin olarak
-                            kişisel verilerinizin aktarıldığı üçüncü kişilere
-                            bildirilmesini isteme, Kanun’un ve ilgili sair mevzuat
-                            hükümlerine uygun olarak işlenmiş olmasına rağmen,
-                            işlenmesini gerektiren sebeplerin ortadan kalkması
-                            halinde kişisel verilerin silinmesini veya yok
-                            edilmesini isteme ve bu kapsamda yapılan işlemin
+                            6698 Sayılı Kişisel Verilerin Korunması Kanunu’nun
+                            11. maddesi uyarınca; kişisel verilerinizin işlenip
+                            işlenmediğini öğrenme, kişisel verileriniz
+                            işlenmişse buna ilişkin bilgi talep etme, kişisel
+                            verilerinizin işlenme amacını ve bunların amacına
+                            uygun kullanılıp kullanılmadığını öğrenme, yurt
+                            içinde veya yurt dışında kişisel verilerinizin
+                            aktarıldığı üçüncü kişileri bilme, kişisel
+                            verilerinizin eksik veya yanlış işlenmiş olması
+                            halinde bunların düzeltilmesini isteme ve bu
+                            kapsamda yapılan işleme ilişkin olarak kişisel
+                            verilerinizin aktarıldığı üçüncü kişilere
+                            bildirilmesini isteme, Kanun’un ve ilgili sair
+                            mevzuat hükümlerine uygun olarak işlenmiş olmasına
+                            rağmen, işlenmesini gerektiren sebeplerin ortadan
+                            kalkması halinde kişisel verilerin silinmesini veya
+                            yok edilmesini isteme ve bu kapsamda yapılan işlemin
                             kişisel verilerinizin aktarıldığı üçüncü kişilere
                             bildirilmesini isteme, işlenen verilerin münhasıran
                             otomatik sistemler vasıtasıyla analiz edilmesi
                             suretiyle aleyhinize bir sonucun ortaya çıkmasına
                             itiraz etme, kişisel verilerinizin Kanun’a aykırı
                             olarak işlenmesi sebebiyle zarara uğramanız halinde
-                            zararın giderilmesini talep etme haklarına sahipsiniz.
-                            Kişisel veri sahipleri olarak, az önce saymış
-                            olduğumuz haklarınıza ilişkin taleplerinizi, söz
-                            konusu yöntemlerle Şirket’e iletmeniz durumunda
+                            zararın giderilmesini talep etme haklarına
+                            sahipsiniz. Kişisel veri sahipleri olarak, az önce
+                            saymış olduğumuz haklarınıza ilişkin taleplerinizi,
+                            söz konusu yöntemlerle Şirket’e iletmeniz durumunda
                             Şirketimiz talebin niteliğine göre en kısa sürede ve
                             en geç otuz gün içinde ücretsiz olarak
-                            sonuçlandıracaktır. Ancak, işlemin ayrıca bir maliyeti
-                            gerektirmesi halinde Kişisel Verileri Koruma Kurulunca
-                            belirlenen tarifedeki ücret alınabilir.
+                            sonuçlandıracaktır. Ancak, işlemin ayrıca bir
+                            maliyeti gerektirmesi halinde Kişisel Verileri
+                            Koruma Kurulunca belirlenen tarifedeki ücret
+                            alınabilir.
                             <br />
                             <br />
-                            Kanun’un 13. maddesinin 1. fıkrası gereğince, yukarıda
-                            belirtilen haklarınızı kullanmak ile ilgili
-                            talebinizi, yazılı olarak veya Kişisel Verileri Koruma
-                            Kurulu’nun belirlediği diğer yöntemlerle Şirket’e
-                            iletebilirsiniz. Kişisel Verileri Koruma Kurulu
-                            tarafından şu aşamada ilgili haklarınızın kullanımına
-                            ilişkin herhangi bir yöntem belirlemediği için,
-                            başvurunuzu Kanun gereğince, yazılı olarak Şirket’e
-                            iletmeniz gerekmektedir.
+                            Kanun’un 13. maddesinin 1. fıkrası gereğince,
+                            yukarıda belirtilen haklarınızı kullanmak ile ilgili
+                            talebinizi, yazılı olarak veya Kişisel Verileri
+                            Koruma Kurulu’nun belirlediği diğer yöntemlerle
+                            Şirket’e iletebilirsiniz. Kişisel Verileri Koruma
+                            Kurulu tarafından şu aşamada ilgili haklarınızın
+                            kullanımına ilişkin herhangi bir yöntem
+                            belirlemediği için, başvurunuzu Kanun gereğince,
+                            yazılı olarak Şirket’e iletmeniz gerekmektedir.
                             <br />
                             <br />
                             Çerezler
@@ -968,16 +967,16 @@ const form = useForm({
                             kaydedilmesi yolu ile internet sitesini hangi zaman
                             dilimi içerisinde, ne kadar süre ile kaç kişinin
                             kullandığı, bir kişinin internet sitesini hangi
-                            amaçlarla, kaç kez ziyaret ettiği ve site üzerinde ne
-                            kadar vakit harcadığı hakkında istatistiksel bilgileri
-                            elde etmek ve kullanıcı sayfalarından dinamik olarak
-                            reklam ve içerik üretilmesine yardımcı olmak amacı ile
-                            sağlanmaktadır. İnternet sitemizi kullanarak
-                            kullanılan çerezleri onaylamış olursunuz. Şirket, söz
-                            konusu çerezler aracılığı ile verilerinizi işleyebilir
-                            ve elde edilen bilgileri analiz etme amacı ile bu
-                            kapsamda yurtiçinde ve yurtdışında üçüncü kişilere
-                            aktarabilir.
+                            amaçlarla, kaç kez ziyaret ettiği ve site üzerinde
+                            ne kadar vakit harcadığı hakkında istatistiksel
+                            bilgileri elde etmek ve kullanıcı sayfalarından
+                            dinamik olarak reklam ve içerik üretilmesine
+                            yardımcı olmak amacı ile sağlanmaktadır. İnternet
+                            sitemizi kullanarak kullanılan çerezleri onaylamış
+                            olursunuz. Şirket, söz konusu çerezler aracılığı ile
+                            verilerinizi işleyebilir ve elde edilen bilgileri
+                            analiz etme amacı ile bu kapsamda yurtiçinde ve
+                            yurtdışında üçüncü kişilere aktarabilir.
                             <br />
                             <br />
                             Çerezler tarafından verileriniz toplanmadan internet
@@ -992,16 +991,17 @@ const form = useForm({
                             Açık Rıza
                             <br />
                             <br />
-                            Sizler, internet sitemize girerek tarafımıza sağlamış
-                            olduğunuz kişisel verilerinizin Kanun’a ve işbu 6698
-                            Sayılı Kişisel Verilerin Korunması Kanunu’ne uygun bir
-                            şekilde ve belirtilen amaçlarla işlenebileceğini
-                            bilmekte, kabul etmekte ve ayrıca işbu 6698 Sayılı
-                            Kişisel Verilerin Korunması Kanunu ile Kanun
-                            kapsamında yapılması gereken aydınlatma yükümlülüğü
-                            yerine getirildiğini, Sözleşme’yi okuduğunuzu,
-                            anladığınızı, haklarınızın ve yükümlülüklerinin
-                            bilincinde olduğunuzu beyan etmektesiniz.
+                            Sizler, internet sitemize girerek tarafımıza
+                            sağlamış olduğunuz kişisel verilerinizin Kanun’a ve
+                            işbu 6698 Sayılı Kişisel Verilerin Korunması
+                            Kanunu’ne uygun bir şekilde ve belirtilen amaçlarla
+                            işlenebileceğini bilmekte, kabul etmekte ve ayrıca
+                            işbu 6698 Sayılı Kişisel Verilerin Korunması Kanunu
+                            ile Kanun kapsamında yapılması gereken aydınlatma
+                            yükümlülüğü yerine getirildiğini, Sözleşme’yi
+                            okuduğunuzu, anladığınızı, haklarınızın ve
+                            yükümlülüklerinin bilincinde olduğunuzu beyan
+                            etmektesiniz.
                             <br />
                             <br />
                           </p>
@@ -1025,8 +1025,8 @@ const form = useForm({
                           </FormControl>
                           <div className="leading-none">
                             <FormLabel className="text-sm font-medium text-gray-700">
-                              6698 Sayılı Kişisel Verilerin Korunması Kanunu hakkında
-                              bilgilendirmeyi okudum, kabul ediyorum.
+                              6698 Sayılı Kişisel Verilerin Korunması Kanunu
+                              hakkında bilgilendirmeyi okudum, kabul ediyorum.
                             </FormLabel>
                             <FormMessage className="text-xs" />
                           </div>
@@ -1046,9 +1046,18 @@ const form = useForm({
                     }}
                     className="bg-red-400 text-white border border-gray-300 hover:bg-red-600 h-11 text-sm rounded-lg px-5 font-medium transition-all shadow-sm flex items-center group"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1.5 text-white group-hover:text-white transition-colors" viewBox="0 0 20 20" fill="currentColor">
-                                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                </svg>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-5 w-5 mr-1.5 text-white group-hover:text-white transition-colors"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
                     İptal
                   </Button>
 

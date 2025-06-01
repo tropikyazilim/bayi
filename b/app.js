@@ -20,15 +20,27 @@ import ayarlarRoutes from "./routes/ayarlarRoutes.js";
 import demolarRoutes from "./routes/demolarRoutes.js";
 import { getAllLisanslar } from "./controllers/lisansController.js";
 
-// .env dosyasını yükle
-dotenv.config();
-
 // __dirname değişkenini ESM için tanımla
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// .env dosyasını ortama göre yükle (eğer db.js'den önce çalıştırılırsa)
+const envPath = path.join(
+  __dirname,
+  process.env.NODE_ENV === "production" ? ".env.production" : ".env.development"
+);
+dotenv.config({ path: envPath });
+
 const app = express();
 const PORT = process.env.PORT || 3002; // Portu 3002 olarak değiştirdim
+
+// Ortam bilgisini loglama
+console.log(
+  `[${new Date().toISOString()}] Uygulama ${
+    process.env.NODE_ENV || "development"
+  } ortamında başlatılıyor`
+);
+console.log(`[${new Date().toISOString()}] Port: ${PORT}`);
 
 // Middleware
 app.use(cors()); // CORS middleware eklendi
@@ -320,9 +332,30 @@ app.put("/api/lisanslar/:id/toggle-kilit", async (req, res) => {
   }
 });
 
+// Production ortamında hata yönetimi
+if (process.env.NODE_ENV === 'production') {
+  app.use((err, req, res, next) => {
+    console.error(`[${new Date().toISOString()}] Hata:`, err);
+    res.status(500).json({ 
+      message: 'Sunucu hatası oluştu', 
+      error: 'Detaylar için log dosyalarına bakın'
+    });
+  });
+} else {
+  // Development ortamında hata detaylarını göster
+  app.use((err, req, res, next) => {
+    console.error(`[${new Date().toISOString()}] Hata:`, err);
+    res.status(500).json({ 
+      message: 'Sunucu hatası oluştu', 
+      error: err.message,
+      stack: err.stack
+    });
+  });
+}
+
 // Sunucuyu başlat
 app.listen(PORT, () => {
-  console.log(`Server ${PORT} portunda çalışıyor`);
+  console.log(`[${new Date().toISOString()}] Server ${PORT} portunda çalışıyor (${process.env.NODE_ENV || 'development'} ortamı)`);
 });
 
 export default app;

@@ -9,8 +9,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// .env dosyasını yükle
-dotenv.config();
+// .env dosyasını ortama göre yükle
+const envPath = path.join(__dirname, process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development');
+dotenv.config({ path: envPath });
+console.log(`[${new Date().toISOString()}] ${process.env.NODE_ENV || 'development'} ortamı için yapılandırma yüklendi: ${envPath}`);
 
 // Veritabanı bağlantı durumu
 let dbState = {
@@ -160,10 +162,9 @@ export async function createConnection() {
       port: process.env.DB_PORT,
     };
     
-    console.log('Bağlanılacak veritabanı bilgileri:', {
+    console.log(`[${new Date().toISOString()}] ${process.env.NODE_ENV || 'development'} ortamında veritabanına bağlanılıyor:`, {
       host: dbConfig.host,
       user: dbConfig.user,
-      // password gizlendi
       database: dbConfig.database,
       port: dbConfig.port
     });

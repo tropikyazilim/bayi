@@ -5,6 +5,7 @@ import { columns } from "./DemoListesiColumns";
 import { MRT_ColumnDef } from "material-react-table";
 import axios from "axios";
 import { toast } from "sonner";
+import { getEnvVariable } from "@/lib/env-utils";
 
 //example data type
 export type Person = {
@@ -23,8 +24,11 @@ export type Person = {
   created_at?: string;
   updated_at?: string;
 };
-export default function DemoListesi() {
-  const tableColumns = useMemo<MRT_ColumnDef<Person>[]>(() => columns, []);
+export default function DemoListesi() {  const tableColumns = useMemo<MRT_ColumnDef<Person>[]>(() => columns, []);
+
+  // Ortam değişkenini yardımcı fonksiyon ile alıyoruz
+  const apiUrl = getEnvVariable('VITE_API_URL', 'http://localhost:3002');
+  console.log("Kullanılan API URL:", apiUrl);
 
   const {
     data: DemoData,
@@ -36,7 +40,7 @@ export default function DemoListesi() {
     queryKey: ["demolar"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/demolar");
+        const response = await axios.get(`${apiUrl}/api/demolar`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);

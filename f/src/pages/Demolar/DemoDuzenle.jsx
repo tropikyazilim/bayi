@@ -410,6 +410,9 @@ const iller = [
 ];
 
 export default function DemoDuzenle() {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
+
   const { id } = useParams();
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(null);
@@ -448,7 +451,7 @@ export default function DemoDuzenle() {
     queryFn: async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3002/api/bayiler/unvan"
+          `${apiUrl}/api/bayiler/unvan`
         );
         console.log("Bayiler verileri alındı:", response.data);
         return response.data;
@@ -476,7 +479,7 @@ export default function DemoDuzenle() {
     queryFn: async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3002/api/demolar/${id}`
+          `${apiUrl}/api/demolar/${id}`
         );
         console.log("Demo verileri yüklendi:", response.data);
         return response.data;
@@ -529,12 +532,12 @@ export default function DemoDuzenle() {
       if (id) {
         // Güncelleme işlemi
         return axios.put(
-          `http://localhost:3002/api/demolar/${id}`,
+          `${apiUrl}/api/demolar/${id}`,
           DemoDuzenleData
         );
       } else {
         // Yeni kayıt işlemi
-        return axios.post(`http://localhost:3002/api/demolar`, DemoDuzenleData);
+        return axios.post(`${apiUrl}/api/demolar`, DemoDuzenleData);
       }
     },
     onSuccess: (data) => {

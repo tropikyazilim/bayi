@@ -25,6 +25,8 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query"; // React Query eklendi
 
 export default function MusteriDataTable({ columns, data }) {
+
+  
   const navigate = useNavigate();
   const [filtering, setFiltering] = useState("");
 

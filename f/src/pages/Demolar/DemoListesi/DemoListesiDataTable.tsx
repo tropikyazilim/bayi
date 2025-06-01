@@ -10,7 +10,7 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Email as EmailIcon,
-} from '@mui/icons-material';
+} from "@mui/icons-material";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query"; // React Query eklendi
 import {
@@ -30,11 +30,7 @@ import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { Button as Buttonshad } from "@/components/ui/button";
-import {
-  
-  MRT_ActionMenuItem,
-  
-} from 'material-react-table';
+import { MRT_ActionMenuItem } from "material-react-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -51,8 +47,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
+import { getEnvVariable } from "@/lib/env-utils"; // Ortam değişkenlerini almak için yardımcı fonksiyon
 import { DropdownMenuCheckboxItem } from "@/components/ui/dropdown-menu";
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3002";
+const apiUrl = getEnvVariable("VITE_API_URL", "http://localhost:3002");
+console.log("Kullanılan API URL:", apiUrl);
 
 interface TableParameter {
   parametreid: number;
@@ -106,8 +104,9 @@ export default function DemoListesiDataTable({
       ...prev,
       ...updates,
     }));
-  };  const [pageSize, setPageSize] = useState(10);
-  
+  };
+  const [pageSize, setPageSize] = useState(10);
+
   // Table instance definition - MUST be before any useEffects that use it
   const table = useMaterialReactTable({
     columns,
@@ -123,22 +122,25 @@ export default function DemoListesiDataTable({
     enableColumnOrdering: true,
     enableFacetedValues: true,
     columnResizeMode: "onChange",
-    enableFullScreenToggle: false,    enableHiding: true,
+    enableFullScreenToggle: false,
+    enableHiding: true,
     enableDensityToggle: true,
-    enableRowActions: true,    renderRowActions: ({ row, table }) => (
-        <Box sx={{ display: 'flex', flexWrap: 'nowrap', gap: '8px' }}>
-          <IconButton
-            color="primary"
-            onClick={() =>
-              window.open(
-                `mailto:kevinvandy@mailinator.com?subject=Hello ${row.original.firstName}!`,
-              )
-            }
-          >
-            <EmailIcon />
-          </IconButton>
-        </Box>
-    ),rowsPerPageOptions: [5, 10, 20, 50, 100],
+    enableRowActions: true,
+    renderRowActions: ({ row, table }) => (
+      <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
+        <IconButton
+          color="primary"
+          onClick={() =>
+            window.open(
+              `mailto:kevinvandy@mailinator.com?subject=Hello ${row.original.firstName}!`
+            )
+          }
+        >
+          <EmailIcon />
+        </IconButton>
+      </Box>
+    ),
+    rowsPerPageOptions: [5, 10, 20, 50, 100],
     state: {
       columnOrder: tableConfig.columnOrder,
       columnFilters: tableConfig.columnFilters,
@@ -146,7 +148,8 @@ export default function DemoListesiDataTable({
       columnSizing: tableConfig.columnSizing,
       sorting: tableConfig.sorting,
       pagination: { pageIndex: currentPageIndex, pageSize: pageSize },
-    },    onPaginationChange: (updater) => {
+    },
+    onPaginationChange: (updater) => {
       if (typeof updater === "function") {
         const newState = updater(table.getState().pagination);
         setCurrentPageIndex(newState.pageIndex);
@@ -154,14 +157,24 @@ export default function DemoListesiDataTable({
           setPageSize(newState.pageSize);
         }
         setIsManualPageChange(true);
-        console.log("Pagination changed (function):", newState.pageIndex + 1, "Page size:", newState.pageSize);
+        console.log(
+          "Pagination changed (function):",
+          newState.pageIndex + 1,
+          "Page size:",
+          newState.pageSize
+        );
       } else {
         setCurrentPageIndex(updater.pageIndex);
         if (updater.pageSize !== pageSize) {
           setPageSize(updater.pageSize);
         }
         setIsManualPageChange(true);
-        console.log("Pagination changed (direct):", updater.pageIndex + 1, "Page size:", updater.pageSize);
+        console.log(
+          "Pagination changed (direct):",
+          updater.pageIndex + 1,
+          "Page size:",
+          updater.pageSize
+        );
       }
       // Force re-render to update UI
       setPaginationKey((prev) => prev + 1);
@@ -267,7 +280,7 @@ export default function DemoListesiDataTable({
     queryKey: ["parametreler"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/ayarlar");
+        const response = await axios.get(`${apiUrl}/api/ayarlar`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);
@@ -364,7 +377,7 @@ export default function DemoListesiDataTable({
   const updateParametersMutation = useMutation<any, Error, TableParameter[]>({
     mutationFn: async (parameterData) => {
       console.log("Mutation çağrıldı, gönderilen veri:", parameterData);
-      return axios.put(`${API_URL}/api/ayarlar`, parameterData, {
+      return axios.put(`${apiUrl}/api/ayarlar`, parameterData, {
         headers: { "Content-Type": "application/json" },
       });
     },
@@ -608,7 +621,7 @@ export default function DemoListesiDataTable({
     toast.info("Varsayılan tasarım yükleniyor...");
 
     try {
-      const response = await axios.get(`${API_URL}/api/ayarlar/varsayilan/4`);
+      const response = await axios.get(`${apiUrl}/api/ayarlar/varsayilan/4`);
       const tasarimVerisi: TableDesign = response.data?.deger
         ? typeof response.data.deger === "string"
           ? JSON.parse(response.data.deger)
@@ -680,7 +693,7 @@ export default function DemoListesiDataTable({
     }
   }
   // row a tıklandığında demo düzenleme sayfasına yönlendiricimiz
-  
+
   // const handleRowClick = (row) => {
   //   const demoId = row.original.id;
   //   if (demoId) {
@@ -814,7 +827,6 @@ export default function DemoListesiDataTable({
             },
           },
         }}
-        
       />
     </>
   );

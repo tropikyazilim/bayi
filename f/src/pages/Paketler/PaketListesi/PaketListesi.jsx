@@ -7,6 +7,10 @@ import axios from "axios";
 import { toast } from "sonner";
 
 export default function PaketListesi() {
+
+ const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
+
   const {
     data: paketData,
     isLoading,
@@ -16,7 +20,7 @@ export default function PaketListesi() {
     queryKey: ["paketler"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/paketler");
+        const response = await axios.get(`${apiUrl}/api/paketler`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);

@@ -7,12 +7,16 @@ import axios from "axios"
 import { toast } from "sonner"
 
 export default function LisansListesi() {
+  
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
+
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["lisans"],
     queryFn: async () => {
       try {
         console.log("API isteği yapılıyor: /api/lisans");
-        const response = await axios.get("http://localhost:3002/api/lisans");
+        const response = await axios.get(`${apiUrl}/api/lisans`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);

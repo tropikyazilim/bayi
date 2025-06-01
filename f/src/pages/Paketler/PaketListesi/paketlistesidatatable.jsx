@@ -44,10 +44,13 @@ export function PaketListesiDataTable({ columns, data }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [selectedPaketId, setSelectedPaketId] = useState(null);
 
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
+
   const handleDelete = async () => {
     try {
       console.log("Silinmeye çalışılan paket ID:", selectedPaketId);
-      await axios.delete(`http://localhost:3002/api/paketler/${selectedPaketId}`);
+      await axios.delete(`${apiUrl}/api/paketler/${selectedPaketId}`);
       console.log("Silme işlemi başarılı");
       
       queryClient.invalidateQueries(["paketler"]);

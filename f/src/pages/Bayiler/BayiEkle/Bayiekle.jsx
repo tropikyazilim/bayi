@@ -430,7 +430,8 @@ export default function BayiEkle() {
 
   // QueryClient oluştur
   const queryClient = useQueryClient();
-
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
   // Cities verilerini getirmek için useQuery kullanımı
   const {
     data: citiesResult,
@@ -441,7 +442,7 @@ export default function BayiEkle() {
     queryKey: ["cities"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/cities");
+        const response = await axios.get(`${apiUrl}/api/cities`);
         console.log("İl ve ilçe verileri yüklendi:", response.data);
         return response.data;
       } catch (error) {
@@ -477,7 +478,7 @@ export default function BayiEkle() {
     queryFn: async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3002/api/bayiler/unvan"
+          `${apiUrl}/api/bayiler/unvan`
         );
         console.log("Bayiler verileri alındı:", response.data);
         return response.data;
@@ -516,7 +517,7 @@ export default function BayiEkle() {
 
   const createBayiMutation = useMutation({
     mutationFn: (bayiData) => {
-      return axios.post("http://localhost:3002/api/bayiler", bayiData);
+      return axios.post(`${apiUrl}/api/bayiler`, bayiData);
     },
     onSuccess: () => {
       setSuccess(true);
@@ -588,7 +589,8 @@ export default function BayiEkle() {
       <div className="h-full w-full ">
         <div className="h-full w-full p-1 ">
           <Form {...form}>
-            <form              onSubmit={form.handleSubmit(onSubmit)}
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
               className="bg-white p-4 rounded-lg shadow-md shadow-slate-300"
             >
               {error && (
@@ -600,7 +602,6 @@ export default function BayiEkle() {
                 <h1 className="text-2xl font-bold text-white py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
                   Bayi Ekle
                 </h1>
-                
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-8">
                 {/* İlk Satır */}

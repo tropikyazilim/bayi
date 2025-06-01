@@ -393,6 +393,8 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
   const [selectedIl, setSelectedIl] = React.useState("");
   const [openIller, setOpenIller] = React.useState(false);
   const queryClient = useQueryClient(); // QueryClient'ı al
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
   const form = useForm({
     defaultValues: {
       lisans_arama: "",
@@ -492,7 +494,7 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
           });
           setError(null); // Her yeni istek başlangıcında error durumunu sıfırla
           console.log("Filtreleme isteği yapılıyor:", queryParams.toString());
-          const apiUrl = `http://localhost:3002/api/lisanslar/filter?${queryParams.toString()}`; // DÜZELTİLDİ: /api/lisans/filter -> /api/lisanslar/filter
+          const apiUrl = `${apiUrl}/api/lisanslar/filter?${queryParams.toString()}`; // DÜZELTİLDİ: /api/lisans/filter -> /api/lisanslar/filter
           console.log(`Filtreleme URL: ${apiUrl}`);
 
           try {
@@ -554,9 +556,7 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
           console.log(
             "API'dan tüm verileri getiriyorum - Bu normalde olmamalı"
           );
-          const response = await axios.get(
-            "http://localhost:3002/api/lisanslar"
-          );
+          const response = await axios.get(`${apiUrl}/api/lisanslar`);
           return response.data;
         }
       } catch (error) {
@@ -691,7 +691,7 @@ export function LisansListesiDataTable({ columns, data, refetch }) {
     queryKey: ["paketler"],
     queryFn: async () => {
       try {
-        const response = await axios.get("http://localhost:3002/api/paketler");
+        const response = await axios.get(`${apiUrl}/api/paketler`);
         return response.data;
       } catch (error) {
         console.error("Paket verileri çekilemedi:", error);

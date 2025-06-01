@@ -41,6 +41,9 @@ export default function PaketDuzenle() {
   const [isLoading, setIsLoading] = useState(false);
    const queryClient = useQueryClient();
 
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
+
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,7 +56,7 @@ export default function PaketDuzenle() {
 
   const createPaketDuzenleMutation = useMutation({
     mutationFn: (PaketDuzenleData) => {
-      return axios.put(`http://localhost:3002/api/paketler/${id}`, PaketDuzenleData);
+      return axios.put(`${apiUrl}/api/paketler/${id}`, PaketDuzenleData);
     },
     onSuccess: () => {
       setSuccess(true);
@@ -106,7 +109,7 @@ const {
     queryFn: async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3002/api/moduller"
+          `${apiUrl}/api/moduller`
         );
         return response.data || [];
       } catch (error) {
@@ -130,7 +133,7 @@ const {
     queryFn: async () => {
       try {
         const response = await axios.get(
-          `http://localhost:3002/api/paketler/${id}`
+          `${apiUrl}/api/paketler/${id}`
         );
         console.log("Paket duzenle verileri yüklendi:", response.data);
         return response.data;

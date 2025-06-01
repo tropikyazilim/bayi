@@ -1,18 +1,21 @@
-"use client"
+"use client";
 
-import { useQuery } from "@tanstack/react-query"
-import { DataTable } from "./BayiDataTable"
-import { columns } from "./BayiColumns"
-import axios from "axios"
-import { toast } from "sonner"
+import { useQuery } from "@tanstack/react-query";
+import { DataTable } from "./BayiDataTable";
+import { columns } from "./BayiColumns";
+import axios from "axios";
+import { toast } from "sonner";
 
 export default function BayiListesi() {
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
+
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ["bayiler"],
     queryFn: async () => {
       try {
-        console.log("API isteği yapılıyor: /api/bayiler");
-        const response = await axios.get("http://localhost:3002/api/bayiler");
+        console.log(`${apiUrl}/api/bayiler`);
+        const response = await axios.get(`${apiUrl}/api/bayiler`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);
@@ -24,7 +27,7 @@ export default function BayiListesi() {
     // Ağ bağlantısı geri geldiğinde otomatik yeniden çekmeyi devre dışı bırak
     refetchOnReconnect: false,
     // Stale time'ı arttır - 5 dakika içinde tekrar çekilmesin
-    staleTime: 5 * 60 * 1000
+    staleTime: 5 * 60 * 1000,
   });
 
   if (isLoading) {
@@ -44,7 +47,8 @@ export default function BayiListesi() {
         <div className="flex flex-col justify-center items-center h-32">
           <div className="text-red-500 mb-2">
             Veri yüklenirken bir hata oluştu
-          </div>          <button 
+          </div>{" "}
+          <button
             onClick={() => refetch()}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm"
           >
@@ -62,15 +66,19 @@ export default function BayiListesi() {
           <div className="py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold text-white">Bayi Listesi</h1>
-              
             </div>
-          </div>          <div className="flex-1 p-4 min-h-0">
+          </div>{" "}
+          <div className="flex-1 p-4 min-h-0">
             <div className="h-full overflow-hidden">
-              <DataTable columns={columns} data={data || []} refetch={refetch} />
+              <DataTable
+                columns={columns}
+                data={data || []}
+                refetch={refetch}
+              />
             </div>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

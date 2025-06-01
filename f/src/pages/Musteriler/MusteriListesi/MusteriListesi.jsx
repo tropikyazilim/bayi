@@ -7,6 +7,10 @@ import axios from "axios";
 import { toast } from "sonner";
 
 export default function MusteriListesi() {
+
+  const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+  console.log("Kullanılan API URL:", apiUrl);
+
   const {
     data: musteriData,
     isLoading,
@@ -17,7 +21,7 @@ export default function MusteriListesi() {
     queryFn: async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3002/api/musteriler"
+          `${apiUrl}/api/musteriler`
         );
         return response.data || [];
       } catch (error) {
