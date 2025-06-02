@@ -25,16 +25,12 @@ const queryClient = new QueryClient({
 })
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <ClerkProvider
+  <StrictMode>    <ClerkProvider
       publishableKey={clerk_key}
       appearance={{
         baseTheme: neobrutalism
       }}
       localization={trTR}
-      frontendApi="https://bayi.volkankok.dev/clerk"
-      domain="bayi.volkankok.dev"
-      proxyUrl="/clerk"
     >
       <QueryClientProvider client={queryClient}>
         <App />

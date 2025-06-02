@@ -16,16 +16,9 @@ export default defineConfig(({ command, mode }) => {
       alias: {
         "@": path.resolve(__dirname, "./src"),
       },
-    },
-    server: {
+    },    server: {
       port: 5173, // Development server port
       proxy: {
-        '/clerk': {
-          target: 'https://bayi.volkankok.dev',
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path) => path
-        },
         '/api': {
           target: 'https://bayi.volkankok.dev',
           changeOrigin: true,
@@ -36,10 +29,15 @@ export default defineConfig(({ command, mode }) => {
     build: {
       outDir: 'dist',
       sourcemap: mode !== 'production',
-    },
-    // Define custom variables - Bu Vite'ın import.meta.env üzerinden erişimini kolaylaştırır
+    },    // Define only the necessary environment variables
     define: {
-      'process.env': env
+      'process.env': {
+        NODE_ENV: JSON.stringify(env.NODE_ENV),
+        PORT: JSON.stringify(env.PORT || '5173'),
+        // Add other necessary environment variables here, for example:
+        // API_URL: JSON.stringify(env.API_URL),
+        // PUBLIC_KEY: JSON.stringify(env.PUBLIC_KEY),
+      }
     }
   }
 })
