@@ -235,133 +235,128 @@ const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
   }, [parametersData, form]);
 
   return (
-    <>
-      <div className="h-full w-full">
-        <div className="bg-white p-4 rounded-lg shadow-md max-h-[calc(100vh-120px)] overflow-y-auto shadow-slate-300">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
-              {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
-                  {error}
-                </div>
-              )}{" "}
-              <div className="mb-6">
-              <h1 className="text-2xl font-bold text-white py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
+    <div className="h-full w-full p-4">
+      <div className="bg-white rounded-lg shadow-md max-h-[calc(100vh-120px)] overflow-y-auto shadow-slate-300">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+            {error && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
+                {error}
+              </div>
+            )}
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-white py-2 px-4 border-b bg-cyan-700 rounded-t-lg">
                 Genel Ayarlar
               </h1>
               <div className="h-0.5 bg-gray-200 w-full"></div>
             </div>
-              <Tabs defaultValue="moduller" className="w-[800px]">
+            <div className="px-4 pb-4">
+              <Tabs defaultValue="moduller" className="w-full max-w-4xl mx-auto">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="moduller">Modüller</TabsTrigger>
                   <TabsTrigger value="lisanslar">Lisanslar</TabsTrigger>
-                </TabsList>{" "}
-                <TabsContent value="moduller">
-                  <div className="h-full w-full">
-                    <div className="h-full w-full p-1">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-3">
-                        {/* Modül Kodu */}
-                        <FormField
-                          control={form.control}
-                          name="modul_kodu"
-                          render={({ field }) => (
-                            <FormItem id="1" className="space-y-1">
-                              <FormLabel className="text-slate-700 font-medium text-m">
-                                Modül Kodu Default Değeri
-                              </FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="text"
-                                  placeholder="Modül Kodu"
-                                  className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage className="text-[10px]" />
-                            </FormItem>
-                          )}
-                        />
-                        {/* Add other license fields here */}
-                      </div>
+                </TabsList>
+                <TabsContent value="moduller" className="mt-4">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="modul_kodu"
+                        render={({ field }) => (
+                          <FormItem className="col-span-1">
+                            <FormLabel className="text-slate-700 font-medium">
+                              Modül Kodu Default Değeri
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Modül Kodu"
+                                className="bg-white border-slate-300 focus:border-blue-500 h-9"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="lisanslar">
-                  <FormField
-                    control={form.control}
-                    name="kullanici_sayisi"
-                    render={({ field }) => (
-                      <FormItem id="2" className="space-y-1">
-                        <FormLabel className="text-slate-700 font-medium text-m">
-                          Kullanıcı Sayısı Ön Tanım
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Kullanıcı Sayısı"
-                            className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-[10px]" />
-                      </FormItem>
-                    )}
-                  />{" "}
-                  <FormField
-                    control={form.control}
-                    name="is_demo_ayar"
-                    render={({ field }) => {
-                      console.log("Switch field render değeri:", field.value);
-                      return (
-                        <FormItem id="3" className="space-y-1">
-                          <FormLabel className="text-slate-700 font-medium text-m mt-2">
-                            Demo Olarak Başlat
-                          </FormLabel>
-                          <FormControl>
-                            <div className="flex items-center space-x-2">
-                              <Switch
-                                checked={field.value === "E"}
-                                onCheckedChange={(checked) => {
-                                  console.log("Switch değişti:", checked);
-                                  field.onChange(checked ? "E" : "H");
-                                  console.log(
-                                    "Form değeri şimdi:",
-                                    checked ? "E" : "H"
-                                  );
-                                }}
-                                id="isdemoswitch"
+                <TabsContent value="lisanslar" className="mt-4">
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="kullanici_sayisi"
+                        render={({ field }) => (
+                          <FormItem className="col-span-1">
+                            <FormLabel className="text-slate-700 font-medium">
+                              Kullanıcı Sayısı Ön Tanım
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="Kullanıcı Sayısı"
+                                className="bg-white border-slate-300 focus:border-blue-500 h-9"
+                                {...field}
                               />
-                              <span className="text-sm text-slate-500">
-                                {field.value === "E" ? "Açık" : "Kapalı"}
-                              </span>
-                            </div>
-                          </FormControl>
-                          <FormMessage className="text-[10px]" />
-                        </FormItem>
-                      );
-                    }}
-                  />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="is_demo_ayar"
+                        render={({ field }) => (
+                          <FormItem className="col-span-1 flex flex-col justify-end">
+                            <FormLabel className="text-slate-700 font-medium">
+                              Demo Olarak Başlat
+                            </FormLabel>
+                            <FormControl>
+                              <div className="flex items-center space-x-2">
+                                <Switch
+                                  checked={field.value === "E"}
+                                  onCheckedChange={(checked) => {
+                                    field.onChange(checked ? "E" : "H");
+                                  }}
+                                />
+                                <span className="text-sm text-slate-500">
+                                  {field.value === "E" ? "Açık" : "Kapalı"}
+                                </span>
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
                 </TabsContent>
               </Tabs>
-              <div className="flex flex-col justify-end space-y-2 md:space-y-0 md:space-x-2 md:flex-row md:items-end mt-5">
+            </div>
+            <div className="border-t mt-8">
+              <div className="flex flex-col sm:flex-row sm:justify-end items-center gap-3 px-6 py-4 bg-gray-50">
                 <Button
                   type="button"
                   onClick={() => form.reset()}
-                  className="bg-red-800 hover:bg-red-500 text-white h-10 text-sm px-3 py-0 pl-4 pr-4 mr-5"
+                  className="w-full sm:w-auto bg-red-800 hover:bg-red-700 text-white font-medium"
+                  size="lg"
                 >
                   İptal
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white h-10 text-sm px-3 py-0 pl-4 pr-4"
+                  className="w-full sm:w-auto bg-cyan-700 hover:bg-cyan-600 text-white font-medium"
+                  size="lg"
                 >
                   Kaydet
                 </Button>
               </div>
-            </form>
-          </Form>
-        </div>
+            </div>
+          </form>
+        </Form>
       </div>
-    </>
+    </div>
   );
 }

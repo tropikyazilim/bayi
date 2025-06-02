@@ -59,39 +59,35 @@ export default function MusteriDataTable({ columns, data }) {
           className="max-w-sm h-8"
         />
       </div>
-      
-      {/* Ana tablo konteyneri - Responsive */}
-      <div className="flex-1 border rounded-md w-full">
-        {/* Tablo başlığı - Sabit */}
-        <div className="rounded-t-md">
-          <div className="overflow-x-auto">
-            <div style={{ minWidth: "1200px" }}>
-              <Table>
-                <TableHeader className="bg-cyan-700">
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id} className="hover:bg-cyan-700">
-                      {headerGroup.headers.map((header) => (
-                        <TableHead key={header.id} className="text-white">
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-              </Table>
-            </div>
-          </div>
-        </div>
-
-        {/* Tablo gövdesi - Sabit genişlikte ve kaydırılabilir */}
-        <div className="overflow-x-auto border-y">
+        {/* Ana tablo konteyneri - Responsive */}
+      <div className="flex-1 border rounded-md">
+        <div className="rounded-md border overflow-x-auto">
           <div style={{ minWidth: "1200px" }}>
-            <Table>
+            <Table className="w-full">
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead
+                        key={header.id}
+                        style={{
+                          width: header.column.columnDef.size,
+                          minWidth: header.column.columnDef.minSize,
+                          maxWidth: header.column.columnDef.maxSize,
+                        }}
+                        className="px-3 py-3 whitespace-nowrap overflow-hidden text-white bg-cyan-700 text-[0.8rem] font-medium relative"
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
               <TableBody>
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row, index) => (
@@ -100,8 +96,8 @@ export default function MusteriDataTable({ columns, data }) {
                       data-state={row.getIsSelected() && "selected"}
                       className={
                         index % 2 === 0
-                          ? "bg-white hover:bg-[#edf7fa] h-12"
-                          : "bg-[#f3fafe] hover:bg-[#e5f5fa] h-12"
+                          ? "bg-white hover:bg-[#edf7fa]"
+                          : "bg-[#f3fafe] hover:bg-[#e5f5fa]"
                       }
                       onClick={() => {
                         navigate(`/musteri/${row.original.id}`);
@@ -109,7 +105,17 @@ export default function MusteriDataTable({ columns, data }) {
                       }}
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="py-3">
+                        <TableCell
+                          key={cell.id}
+                          style={{
+                            width: cell.column.columnDef.size,
+                            minWidth: cell.column.columnDef.minSize,
+                            maxWidth: cell.column.columnDef.maxSize,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                          className="px-3 py-2 text-[0.8rem] font-normal"
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

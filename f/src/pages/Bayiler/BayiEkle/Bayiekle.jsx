@@ -1144,7 +1144,6 @@ export default function BayiEkle() {
               </div>
 
               {/* Adres ve Butonlar */}
-              {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-4  mr-5"> */}
               <FormField
                 control={form.control}
                 name="adres"
@@ -1156,82 +1155,45 @@ export default function BayiEkle() {
                     <FormControl>
                       <Textarea
                         placeholder="Adres"
-                        className="min-h-16 bg-white border-slate-300 focus:border-blue-500 text-m shadow-sm shadow-blue-200"
+                        className="bg-white border-slate-300 focus:border-blue-500 text-m shadow-sm shadow-blue-200 min-h-[100px]"
                         {...field}
                       />
                     </FormControl>
                     <FormMessage className="text-[10px]" />
                   </FormItem>
                 )}
-              />
-
-              <div className="flex justify-end space-x-4 pt-8 border-t border-gray-100 mt-4">
-                <Button
-                  type="button"
-                  onClick={() => {
-                    form.reset();
-                  }}
-                  className="bg-red-400 text-white border border-gray-300 hover:bg-red-600 h-11 text-sm rounded-lg px-5 font-medium transition-all shadow-sm flex items-center group"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-1.5 text-white group-hover:text-white transition-colors"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  İptal
-                </Button>
-
+              />              {/* Butonlar */}
+              <div className="flex flex-wrap gap-2 justify-end mt-6">
                 <Button
                   type="button"
                   className="bg-purple-400 hover:bg-purple-600 text-white h-11 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center relative"
                   onClick={() => {
                     const unvan = form.getValues("unvan");
                     let prefix = "";
-
-                    // Eğer ünvan varsa ilk iki harfini al
                     if (unvan && unvan.length >= 2) {
-                      // Sadece harf ve sayıları al, özel karakterleri atla
                       const validChars = unvan.replace(/[^a-zA-Z0-9]/g, "");
                       if (validChars.length >= 2) {
                         prefix = validChars.substring(0, 2).toUpperCase();
                       } else {
                         toast.warning("Ünvan geçerli değil", {
-                          description:
-                            "Ünvan en az 2 harf veya rakam içermelidir",
+                          description: "Ünvan en az 2 harf veya rakam içermelidir",
                         });
                         return;
                       }
                     } else {
-                      // Ünvan yoksa veya 2 karakterden kısaysa uyarı ver
                       toast.warning("Ünvan alanını doldurun", {
-                        description:
-                          "Ünvan alanı doldurulmadan bayi kodu üretilemez",
+                        description: "Ünvan alanı doldurulmadan bayi kodu üretilemez",
                       });
                       return;
                     }
-
-                    // Toplam uzunluk 12 olacak şekilde, prefix'ten sonra 10 karakterlik random kısım ekle
                     const randomPart = Math.random()
                       .toString(36)
                       .substring(2, 12)
                       .toUpperCase();
-
-                    // Eğer randomPart 10 karakterden kısa ise, tamamlamak için ek karakterler ekle
                     const filledRandomPart = randomPart
                       .padEnd(10, "0")
                       .substring(0, 10);
-
-                    // Ünvan ön eki ve rastgele kısmı birleştir - tam olarak 12 karakter
                     const bayiKodu = prefix + filledRandomPart;
-
-                    // Bayi kodu alanını güncelle
                     form.setValue("bayi_kodu", bayiKodu);
                   }}
                 >
@@ -1250,15 +1212,23 @@ export default function BayiEkle() {
                 >
                   Şifre Üret
                 </Button>
+
                 <Button
                   type="submit"
                   disabled={createBayiMutation.isPending}
-                  className="bg-teal-500 hover:bg-teal-600 text-white h-11 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center relative"
+                  className="bg-green-600 hover:bg-green-700 text-white h-11 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center relative"
                 >
-                  {createBayiMutation.isPending ? "Gönderiliyor..." : "Kaydet"}
+                  {createBayiMutation.isPending ? "Kaydediliyor..." : "Kaydet"}
+                </Button>
+
+                <Button
+                  type="button"
+                  onClick={() => form.reset()}
+                  className="bg-red-600 hover:bg-red-700 text-white h-11 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center relative"
+                >
+                  İptal
                 </Button>
               </div>
-              {/* </div> */}
             </form>
           </Form>
         </div>

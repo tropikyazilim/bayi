@@ -257,15 +257,7 @@ export function DataTable({ columns, data, refetch }) {
     if (filteredData !== undefined && filteredData !== null) {
       console.log("filteredData değişti:", filteredData.length);
       setTableData(filteredData);
-    } // ...existing code...
-    {
-      error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
-          {error}
-        </div>
-      );
     }
-    // ...existing code...
   }, [filteredData]);
 
   // Table yapılandırması - tableData kullanarak tabloyu güncelleyelim
@@ -394,17 +386,18 @@ export function DataTable({ columns, data, refetch }) {
           </div>
           {/* </div> */}
         </form>
-      </Form>{" "}
-      <div className="flex items-center py-2 justify-between">
-        <Input
-          placeholder="Tüm alanlarda arama yapın..."
-          value={filtering}
-          onChange={(e) => setFiltering(e.target.value)}
-          className="max-w-sm h-8"
-        />{" "}
+      </Form>{" "}      <div className="flex flex-wrap items-center justify-between gap-4 py-2">
+        <div className="flex-1 min-w-[200px] max-w-[400px]">
+          <Input
+            placeholder="Tüm alanlarda arama yapın..."
+            value={filtering}
+            onChange={(e) => setFiltering(e.target.value)}
+            className="h-8 w-full bg-white border-slate-300 focus:border-blue-500"
+          />
+        </div>
         <Button
           onClick={refreshData}
-          className="bg-emerald-500 hover:bg-emerald-600 active:bg-cyan-700 h-9 w-28 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200 flex items-center justify-center"
+          className="bg-emerald-500 hover:bg-emerald-600 active:bg-cyan-700 h-9 shrink-0 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg active:shadow-inner transition-all duration-200 flex items-center justify-center"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -423,7 +416,7 @@ export function DataTable({ columns, data, refetch }) {
             <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
           </svg>
           Yenile
-        </Button>{" "}
+        </Button>
       </div>
       <div>
         <div className="rounded-md border">

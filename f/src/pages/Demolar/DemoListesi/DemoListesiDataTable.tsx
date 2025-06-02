@@ -126,21 +126,33 @@ export default function DemoListesiDataTable({
     enableHiding: true,
     enableDensityToggle: true,
     enableRowActions: true,
-    renderRowActions: ({ row, table }) => (
+    renderRowActions: ({ row }) => (
       <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
-        <IconButton
-          color="primary"
-          onClick={() =>
-            window.open(
-              `mailto:kevinvandy@mailinator.com?subject=Hello ${row.original.firstName}!`
-            )
-          }
-        >
-          <EmailIcon />
-        </IconButton>
+        <Tooltip title="Düzenle" arrow>
+          <IconButton
+            onClick={() => navigate(`/demoduzenle/${row.original.id}`)}
+            sx={{
+              backgroundColor: '#ecfeff',
+              '&:hover': {
+                backgroundColor: '#cffafe',
+              },
+            }}
+          >
+            <EditIcon sx={{ color: '#0891b2' }} />
+          </IconButton>
+        </Tooltip>
       </Box>
     ),
-    rowsPerPageOptions: [5, 10, 20, 50, 100],
+    initialState: {
+      pagination: {
+        pageSize: 10,
+        pageIndex: 0
+      },
+      columnOrder: tableConfig.columnOrder,
+      columnFilters: tableConfig.columnFilters,
+      columnVisibility: tableConfig.columnVisibility,
+      density: 'compact'
+    },
     state: {
       columnOrder: tableConfig.columnOrder,
       columnFilters: tableConfig.columnFilters,
