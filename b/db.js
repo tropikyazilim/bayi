@@ -1,4 +1,4 @@
-// Veritabanı bağlantısı için gerekli kodlar
+// Veritabanı bağlantısı için gerekli kodlar v101
 import pg from 'pg'; // PostgreSQL için
 import dotenv from 'dotenv';
 import fs from 'fs';
