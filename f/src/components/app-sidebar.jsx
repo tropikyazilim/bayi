@@ -275,7 +275,7 @@ export function AppSidebar({ onSignOut, ...props }) {
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-medium">Dev Bros Bayi Paneli</span>
-                  <span className="">v1.0.1</span>
+                  <span className="">v1.0.2</span>
                 </div>
               </Link>
             </SidebarMenuButton>
