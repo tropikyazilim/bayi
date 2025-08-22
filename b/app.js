@@ -24,12 +24,8 @@ import { getAllLisanslar } from "./controllers/lisansController.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// .env dosyasını ortama göre yükle (eğer db.js'den önce çalıştırılırsa)
-const envPath = path.join(
-  __dirname,
-  process.env.NODE_ENV === "production" ? ".env.production" : ".env.development"
-);
-dotenv.config({ path: envPath });
+// .env dosyasını yükle
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3002; // Portu 3002 olarak değiştirdim

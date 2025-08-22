@@ -9,10 +9,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// .env dosyasını ortama göre yükle
-const envPath = path.join(__dirname, process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development');
-dotenv.config({ path: envPath });
-console.log(`[${new Date().toISOString()}] ${process.env.NODE_ENV || 'development'} ortamı için yapılandırma yüklendi: ${envPath}`);
+// .env dosyasını yükle
+dotenv.config();
+console.log(`[${new Date().toISOString()}] ${process.env.NODE_ENV || 'development'} ortamı için yapılandırma yüklendi`);
 
 // Veritabanı bağlantı durumu
 let dbState = {
