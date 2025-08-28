@@ -76,8 +76,9 @@ export default function ModulDuzenle() {
     queryKey: ["modulduzenle", id],
     queryFn: async () => {
       try {
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
         const response = await axios.get(
-          `http://localhost:3002/api/moduller/${id}`
+          `${apiUrl}/api/moduller/${id}`
         );
         console.log("Modül verileri yüklendi:", response.data);
         return response.data;
@@ -110,13 +111,15 @@ export default function ModulDuzenle() {
     mutationFn: (modulData) => {
       if (id) {
         // Güncelleme işlemi
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
         return axios.put(
-          `http://localhost:3002/api/moduller/${id}`,
+          `${apiUrl}/api/moduller/${id}`,
           modulData
         );
       } else {
         // Yeni kayıt işlemi
-        return axios.post(`${API_URL}/api/moduller`, modulData);
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+        return axios.post(`${apiUrl}/api/moduller`, modulData);
       }
     },
     onSuccess: (data) => {

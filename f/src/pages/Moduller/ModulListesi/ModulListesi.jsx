@@ -16,9 +16,8 @@ export default function ModulListesi() {
     queryKey: ["moduller"],
     queryFn: async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:3002/api/moduller"
-        );
+        const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3002";
+        const response = await axios.get(`${apiUrl}/api/moduller`);
         return response.data || [];
       } catch (error) {
         console.error("API Hatası:", error);

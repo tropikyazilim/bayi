@@ -48,7 +48,7 @@ export default function ModulListesiDataTable({ columns, data }) {
   const handleDelete = async () => {
     try {
       console.log("Silinmeye çalışılan modül ID:", selectedModulId);
-        await axios.delete(`http://localhost:3002/api/moduller/${selectedModulId}`);
+        await axios.delete(`${API_URL}/api/moduller/${selectedModulId}`);
       console.log("Silme işlemi başarılı");
       
       queryClient.invalidateQueries(["moduller"]);

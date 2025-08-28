@@ -517,22 +517,19 @@ export default function MusteriEkle() {
 
   return (
     <>
-      <div className="h-full w-full">
-        <div className="h-full w-full p-1">
+      <div className="min-h-screen w-full bg-gray-100 flex items-start justify-center pt-0 pb-8">
+        <div className="w-full mx-auto p-1">
           <Form {...form}>
             <form              onSubmit={form.handleSubmit(onSubmit)}
-              className="bg-white p-4 rounded-lg shadow-md shadow-slate-300"
+              className="bg-white p-5 rounded-xl shadow-lg border border-gray-200"
             >
               {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-m">
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
                   {error}
                 </div>
               )}
-              <div className="mb-6">
-                <h1 className="text-2xl font-bold text-white py-2 pl-4 border-b bg-cyan-700 rounded-t-lg">
-                  Müşteri Ekle
-                </h1>
-                
+              <div className="py-2 pl-4 border-b bg-cyan-700 rounded-t-lg mb-6">
+                <span className="text-2xl font-bold text-white">Müşteri Ekle</span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-8">
                 {/* İlk Satır */}
@@ -548,7 +545,7 @@ export default function MusteriEkle() {
                         <Input
                           type="text"
                           placeholder="Ticari Ünvan"
-                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 placeholder:font-normal placeholder:text-gray-400 min-h-0"
                           {...field}
                         />
                       </FormControl>
@@ -571,7 +568,7 @@ export default function MusteriEkle() {
                           defaultValue={field.value}
                           value={field.value}
                         >
-                          <SelectTrigger className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200">
+                          <SelectTrigger className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 min-h-0">
                             <SelectValue placeholder="Yetkili" />
                           </SelectTrigger>
                           <SelectContent>
@@ -597,7 +594,7 @@ export default function MusteriEkle() {
                         <Input
                           type="email"
                           placeholder="E-Posta Giriniz"
-                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 placeholder:font-normal placeholder:text-gray-400 min-h-0"
                           {...field}
                         />
                       </FormControl>
@@ -618,7 +615,7 @@ export default function MusteriEkle() {
                           type="text"
                           placeholder="Telefon Giriniz"
                           maxLength={10}
-                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 placeholder:font-normal placeholder:text-gray-400 min-h-0"
                           {...field}
                         />
                       </FormControl>
@@ -639,7 +636,7 @@ export default function MusteriEkle() {
                           type="text"
                           placeholder="Sıfır Olmadan Giriniz"
                           maxLength={10}
-                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 placeholder:font-normal placeholder:text-gray-400 min-h-0"
                           {...field}
                         />
                       </FormControl>
@@ -659,7 +656,7 @@ export default function MusteriEkle() {
                         <Input
                           type="text"
                           placeholder="Vergi Dairesi"
-                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 placeholder:font-normal placeholder:text-gray-400 min-h-0"
                           {...field}
                         />
                       </FormControl>
@@ -681,7 +678,7 @@ export default function MusteriEkle() {
                           minLength={10}
                           maxLength={11}
                           placeholder="Vergi No Giriniz"
-                          className="bg-white border-slate-300 focus:border-blue-500 h-8 text-m shadow-sm shadow-blue-200"
+                          className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 placeholder:font-normal placeholder:text-gray-400 min-h-0"
                           {...field}
                         />
                       </FormControl>
@@ -714,7 +711,7 @@ export default function MusteriEkle() {
                               role="combobox"
                               size="default"
                               aria-expanded={openIller}
-                              className="w-full justify-between text-gray-700"
+                              className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 w-full justify-between min-h-0"
                             >
                               {field.value
                                 ? iller.find((il) => il.value === field.value)
@@ -788,7 +785,7 @@ export default function MusteriEkle() {
                               role="combobox"
                               size="default"
                               aria-expanded={openIlceler}
-                              className="w-full justify-between text-gray-700"
+                              className="bg-white border border-gray-400 rounded shadow-sm h-8 text-sm font-normal text-gray-800 w-full justify-between min-h-0"
                               disabled={!selectedIl}
                             >
                               {field.value
@@ -856,7 +853,7 @@ export default function MusteriEkle() {
                     <FormControl>
                       <Textarea
                         placeholder="Adres"
-                        className="min-h-16 bg-white border-slate-300 focus:border-blue-500 text-m shadow-sm shadow-blue-200"
+                        className="min-h-24 bg-white border border-neutral-300 rounded-lg shadow-sm text-sm font-normal text-neutral-800 placeholder:text-neutral-400"
                         {...field}
                       />
                     </FormControl>
@@ -864,32 +861,20 @@ export default function MusteriEkle() {
                   </FormItem>
                 )}
               />
-              <div className="flex justify-end space-x-4 pt-8 border-t border-gray-100 mt-4">
+              <div className="flex justify-end gap-3 pt-8 border-t border-neutral-100 mt-4">
                 <Button
                   type="button"
                   onClick={() => {
                     form.reset();
                   }}
-                  className="bg-red-400 text-white border border-gray-300 hover:bg-red-600 h-11 text-sm rounded-lg px-5 font-medium transition-all shadow-sm flex items-center group"
+                  className="bg-white text-neutral-700 border border-neutral-300 hover:bg-neutral-50 h-10 text-sm rounded-lg px-5 font-medium transition-all shadow-sm flex items-center"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 mr-1.5 text-white group-hover:text-white transition-colors"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  İptal
+                  Vazgeç
                 </Button>
 
                 <Button
                   type="submit"
-                  className="bg-teal-500 hover:bg-teal-600 text-white h-11 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center relative"
+                  className="bg-cyan-600 hover:bg-cyan-700 text-white h-10 text-sm rounded-lg px-6 font-medium transition-all shadow-sm flex items-center"
                 >
                   Kaydet
                 </Button>

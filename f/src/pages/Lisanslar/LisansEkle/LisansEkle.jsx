@@ -556,7 +556,7 @@ export default function LisansEkle() {
                                   {filteredBayiler.map((bayi) => (
                                     <CommandItem
                                       key={bayi.id}
-                                      value={bayi.id.toString()}
+                                      value={bayi.unvan}
                                       onSelect={() => {
                                         setSelectedBayi(bayi);
                                         field.onChange(bayi.unvan);
@@ -646,7 +646,7 @@ export default function LisansEkle() {
                                   {musteriler.map((musteri) => (
                                     <CommandItem
                                       key={musteri.id}
-                                      value={musteri.id.toString()}
+                                      value={musteri.unvan}
                                       onSelect={() => {
                                         setSelectedMusteri(musteri);
                                         field.onChange(musteri.unvan);
@@ -733,7 +733,7 @@ export default function LisansEkle() {
                                   {paketler.map((paket) => (
                                     <CommandItem
                                       key={paket.id}
-                                      value={paket.id.toString()}
+                                      value={paket.paket_adi}
                                       onSelect={() => {
                                         setSelectedPaket(paket);
                                         field.onChange(paket.paket_adi);

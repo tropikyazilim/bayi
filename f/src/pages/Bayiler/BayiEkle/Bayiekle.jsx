@@ -1111,7 +1111,7 @@ export default function BayiEkle() {
                                     {bayiler.map((bayi) => (
                                       <CommandItem
                                         key={bayi.id}
-                                        value={bayi.id.toString()}
+                                        value={bayi.unvan}
                                         onSelect={() => {
                                           setSelectedBayi(bayi);
                                           field.onChange(bayi.unvan);
